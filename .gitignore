@@ -9,9 +9,11 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.prisma
 
 # testing
 /coverage
+.agent
 
 # next.js
 /.next/
@@ -45,3 +47,4 @@ AGENTS.md
 CLAUDE.md
 asd.txt
 Jobfather.html
+/src/generated/prisma

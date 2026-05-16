@@ -1,0 +1,168 @@
+// Jobfather - Aspirant Hub
+// Database: Neon PostgreSQL (serverless)
+// ORM: Prisma 7.x
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ────────────────────────────────────────────────
+// AUTH MODELS (NextAuth v5 / Auth.js)
+// ────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // hashed via bcryptjs (email/password flow)
+  role          UserRole  @default(ASPIRANT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts  Account[]
+  sessions  Session[]
+  watchlist ExamWatch[]
+
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ────────────────────────────────────────────────
+// CORE DOMAIN MODELS
+// ────────────────────────────────────────────────
+
+model Job {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  organization   String
+  category       Category
+  totalVacancies Int?
+  description    String?  @db.Text
+  syllabusUrl    String?  // Link to official syllabus PDF
+  sourceUrl      String   // Official notification URL
+  applyUrl       String?  // Direct application link
+  isVerified     Boolean  @default(false)
+  isPrivate      Boolean  @default(false)
+  postedAt       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  timeline ExamTimeline?
+  watches  ExamWatch[]
+
+  @@index([category])
+  @@index([slug])
+  @@index([postedAt(sort: Desc)])
+}
+
+model ExamTimeline {
+  id   String @id @default(cuid())
+  jobId String @unique
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  // Key milestone dates
+  notificationDate DateTime?
+  applicationStart DateTime?
+  applicationEnd   DateTime?
+  admitCardDate    DateTime?
+  examDate         DateTime?
+  resultDate       DateTime?
+
+  // Current lifecycle stage (auto-derived or manually set)
+  currentStage Stage    @default(NOTIFICATION)
+  updatedAt    DateTime @updatedAt
+
+  @@index([currentStage])
+  @@index([applicationEnd]) // Critical for "Closing Soon" queries
+  @@index([examDate])
+}
+
+model ExamWatch {
+  id        String   @id @default(cuid())
+  userId    String
+  jobId     String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId]) // One watch per user per exam
+  @@index([userId])
+  @@index([jobId])
+}
+
+// ────────────────────────────────────────────────
+// ENUMS
+// ────────────────────────────────────────────────
+
+enum UserRole {
+  ASPIRANT
+  ADMIN
+}
+
+enum Category {
+  TPSC
+  SSC
+  UPSC
+  RAILWAY
+  BANKING
+  TEACHING
+  POLICE
+  DEFENCE
+  STATE_PSC
+  PRIVATE
+  OTHER
+}
+
+enum Stage {
+  NOTIFICATION       // Notification released, dates TBA
+  APPLICATION_OPEN   // Application window open
+  APPLICATION_CLOSED // Application window closed
+  ADMIT_CARD         // Admit cards available for download
+  EXAM_SCHEDULED     // Exam is upcoming / in progress
+  RESULT_DECLARED    // Result published
+}
