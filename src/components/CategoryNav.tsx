@@ -23,38 +23,40 @@ export function CategoryNav({
   }, [activeCategory]);
 
   return (
-    <nav
-      ref={navRef}
-      className="flex overflow-x-auto gap-2 px-4 py-3 bg-gray-50 border-b border-gray-200 scrollbar-hide"
-      aria-label="Job categories"
-    >
-      <button
-        onClick={() => onCategoryChange('ALL')}
-        data-active={activeCategory === 'ALL'}
-        className={`px-4 py-2 font-medium whitespace-nowrap rounded-lg transition ${
-          activeCategory === 'ALL'
-            ? 'bg-blue-600 text-white'
-            : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-        }`}
-        aria-pressed={activeCategory === 'ALL'}
+    <div className="bg-[#ff7315] w-full border-none select-none overflow-x-auto scrollbar-hide">
+      <nav
+        ref={navRef}
+        className="max-w-7xl mx-auto flex items-stretch h-12 "
+        aria-label="Job categories"
       >
-        All Jobs
-      </button>
-      {categories.map((cat) => (
         <button
-          key={cat}
-          onClick={() => onCategoryChange(cat)}
-          data-active={activeCategory === cat}
-          className={`px-4 py-2 font-medium whitespace-nowrap rounded-lg transition ${
-            activeCategory === cat
-              ? 'bg-blue-600 text-white'
-              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+          onClick={() => onCategoryChange('ALL')}
+          data-active={activeCategory === 'ALL'}
+          className={`px-6 h-full flex items-center justify-center font-black text-xs uppercase tracking-widest transition-colors cursor-pointer ${
+            activeCategory === 'ALL'
+              ? 'bg-white text-[#ff7315]'
+              : 'bg-[#f17726dd] text-white hover:bg-[#e66712]'
           }`}
-          aria-pressed={activeCategory === cat}
+          aria-pressed={activeCategory === 'ALL'}
         >
-          {cat}
+          ALL JOBS
         </button>
-      ))}
-    </nav>
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => onCategoryChange(cat)}
+            data-active={activeCategory === cat}
+            className={`px-6 h-full flex items-center justify-center font-black text-xs uppercase tracking-widest transition-colors cursor-pointer ${
+              activeCategory === cat
+                ? 'bg-white text-[#ff7315]'
+                : 'bg-[#f17726dd] text-white hover:bg-[#e66712]'
+            }`}
+            aria-pressed={activeCategory === cat}
+          >
+            {cat}
+          </button>
+        ))}
+      </nav>
+    </div>
   );
 }

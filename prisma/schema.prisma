@@ -20,7 +20,7 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  password      String?   // hashed via bcryptjs (email/password flow)
+  password      String? // hashed via bcryptjs (email/password flow)
   role          UserRole  @default(ASPIRANT)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -76,20 +76,21 @@ model VerificationToken {
 // ────────────────────────────────────────────────
 
 model Job {
-  id             String   @id @default(cuid())
-  title          String
-  slug           String   @unique
-  organization   String
-  category       Category
-  totalVacancies Int?
-  description    String?  @db.Text
-  syllabusUrl    String?  // Link to official syllabus PDF
-  sourceUrl      String   // Official notification URL
-  applyUrl       String?  // Direct application link
-  isVerified     Boolean  @default(false)
-  isPrivate      Boolean  @default(false)
-  postedAt       DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                String   @id @default(cuid())
+  title             String
+  slug              String   @unique
+  organization      String
+  category          Category
+  totalVacancies    Int?
+  description       String?  @db.Text
+  syllabusUrl       String? // Link to official syllabus PDF
+  sourceUrl         String // Official notification URL
+  applyUrl          String? // Direct application link
+  isVerified        Boolean  @default(false)
+  isPrivate         Boolean  @default(false)
+  paymentScreenshot String?  @db.Text
+  postedAt          DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   timeline ExamTimeline?
   watches  ExamWatch[]
@@ -100,7 +101,7 @@ model Job {
 }
 
 model ExamTimeline {
-  id   String @id @default(cuid())
+  id    String @id @default(cuid())
   jobId String @unique
   job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
@@ -135,6 +136,24 @@ model ExamWatch {
   @@index([jobId])
 }
 
+model Ad {
+  id          String     @id @default(cuid())
+  label       String // Campaign / display name
+  type        AdType     @default(CUSTOM) // Google or Custom
+  position    AdPosition // Where it appears on site
+  targetUrl   String? // Click-through URL
+  imageUrl    String?    @db.Text // Banner image URL (custom ads)
+  impressions Int        @default(0)
+  clicks      Int        @default(0)
+  isActive    Boolean    @default(true)
+  notes       String?    @db.Text // Internal admin notes
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([isActive])
+  @@index([position])
+}
+
 // ────────────────────────────────────────────────
 // ENUMS
 // ────────────────────────────────────────────────
@@ -159,10 +178,29 @@ enum Category {
 }
 
 enum Stage {
-  NOTIFICATION       // Notification released, dates TBA
-  APPLICATION_OPEN   // Application window open
+  NOTIFICATION // Notification released, dates TBA
+  APPLICATION_OPEN // Application window open
   APPLICATION_CLOSED // Application window closed
-  ADMIT_CARD         // Admit cards available for download
-  EXAM_SCHEDULED     // Exam is upcoming / in progress
-  RESULT_DECLARED    // Result published
+  ADMIT_CARD // Admit cards available for download
+  EXAM_SCHEDULED // Exam is upcoming / in progress
+  RESULT_DECLARED // Result published
+}
+
+enum AdType {
+  GOOGLE // Google AdSense / Ad Manager
+  CUSTOM // Direct custom banner
+}
+
+enum AdPosition {
+  HEADER_TOP // Leaderboard at top of page
+  INLINE_AFTER_3RD // Inside job list after 3rd result
+  SIDEBAR_STICKY // Right sidebar sticky unit
+  FOOTER_BANNER // Bottom of page
+  JOB_DETAIL_TOP // Top of job detail view
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }

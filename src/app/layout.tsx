@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import { Lato } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
+
+const lato = Lato({ 
+  subsets: ["latin"], 
+  weight: ["100", "300", "400", "700", "900"],
+  variable: "--font-lato" 
+});
 
 export const metadata: Metadata = {
   title: "Jobfather | Latest Govt Job Updates, Mock Test & TPSC Vacancies 2026",
@@ -42,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full scroll-smooth">
+    <html lang="en" className={`h-full scroll-smooth ${lato.variable}`} data-scroll-behavior="smooth">
       <head>
         <meta name="theme-color" content="#2563eb" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -54,8 +61,12 @@ export default function RootLayout({
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
           crossOrigin="anonymous"
         />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0"
+        />
       </head>
-      <body className="min-h-full flex flex-col antialiased bg-gray-50">{children}</body>
+      <body className={`min-h-full flex flex-col antialiased bg-slate-50 ${lato.className}`}>{children}</body>
     </html>
   );
 }

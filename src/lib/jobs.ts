@@ -3,7 +3,9 @@ import { Job } from '@/types/job';
 import { Category, Prisma } from '@prisma/client';
 
 export async function getJobs(filters?: { category?: string; search?: string }): Promise<Job[]> {
-  const where: Prisma.JobWhereInput = {};
+  const where: Prisma.JobWhereInput = {
+    isVerified: true,
+  };
 
   if (filters?.category && filters.category !== 'ALL') {
     // Validate category is a valid enum value
@@ -35,8 +37,11 @@ export async function getJobs(filters?: { category?: string; search?: string }):
 }
 
 export async function getJobBySlug(slug: string): Promise<Job | null> {
-  const job = await prisma.job.findUnique({
-    where: { slug },
+  const job = await prisma.job.findFirst({
+    where: {
+      slug,
+      isVerified: true,
+    },
     include: {
       timeline: true,
     },

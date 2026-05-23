@@ -6,11 +6,15 @@
  * - Strategy: JWT (database sessions require edge-incompatible DB calls)
  */
 
-import NextAuth from 'next-auth';
+import NextAuth, { Session } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+
+export function isAdmin(session: Session | null): boolean {
+  return (session?.user as { role?: string } | undefined)?.role === 'ADMIN';
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),

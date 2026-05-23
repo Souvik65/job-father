@@ -11,6 +11,10 @@ interface PostJobPopupProps {
   onClose: () => void;
 }
 
+const isValidEmail = (email: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<PostJobFormData>({
@@ -67,11 +71,11 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
 
       {/* Popup */}
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none transition-opacity ${
-          open ? 'opacity-100 pointer-events-auto' : 'opacity-0'
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity ${
+          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className={`bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl`}>
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">Post a Private Job</h2>
@@ -99,7 +103,7 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
                       value={formData.title}
                       onChange={handleInputChange}
                       placeholder="e.g., Software Developer"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                       required
                     />
                   </div>
@@ -110,7 +114,7 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                       required
                     >
                       <option value="">Select category</option>
@@ -129,7 +133,7 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
                       onChange={handleInputChange}
                       placeholder="Job description, requirements, and details..."
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                     />
                   </div>
                 </div>
@@ -156,7 +160,7 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
                         name="fromDate"
                         value={formData.fromDate}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                         required
                       />
                     </div>
@@ -168,14 +172,14 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
                         value={formData.untilDate}
                         onChange={handleInputChange}
                         min={formData.fromDate}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                         required
                       />
                     </div>
                   </div>
 
                   {/* Pricing breakdown */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="bg-gray-50 border border-gray-500 rounded-lg p-4 text-black">
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600">{totalDays} days</span>
@@ -185,7 +189,7 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
                         <span className="text-gray-600">Rate per day</span>
                         <span className="font-medium">₹{RATE_PER_DAY}</span>
                       </div>
-                      <div className="border-t border-gray-300 pt-2 flex justify-between font-bold text-base">
+                      <div className="border-t border-gray-500 pt-2 flex justify-between font-bold text-base">
                         <span>Total</span>
                         <span className="text-blue-600">₹{totalCost}</span>
                       </div>
@@ -200,9 +204,16 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
                       value={formData.contactEmail}
                       onChange={handleInputChange}
                       placeholder="your@email.com"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 text-black ${
+                        formData.contactEmail && !isValidEmail(formData.contactEmail)
+                          ? 'border-red-500 focus:ring-red-500 focus:border-transparent'
+                          : 'border-gray-500 focus:ring-blue-500'
+                      }`}
                       required
                     />
+                    {formData.contactEmail && !isValidEmail(formData.contactEmail) && (
+                      <p className="text-red-500 text-xs mt-1">Please enter a valid email address.</p>
+                    )}
                   </div>
 
                   <div>
@@ -213,7 +224,7 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
                       value={formData.contactPhone}
                       onChange={handleInputChange}
                       placeholder="+91 9876543210"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                       required
                     />
                   </div>
@@ -229,7 +240,8 @@ export function PostJobPopup({ open, onClose }: PostJobPopupProps) {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition"
+                    disabled={!formData.contactEmail || !isValidEmail(formData.contactEmail) || !formData.contactPhone}
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
                   >
                     Pay ₹{totalCost}
                   </button>
