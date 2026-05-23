@@ -3,26 +3,26 @@
 import { useState, useEffect } from 'react';
 import { subscribeNewsletter } from '@/app/actions';
 
-export function NewsletterPopup() {
+interface NewsletterPopupProps {
+  popupDelay?: number;
+}
+
+export function NewsletterPopup({ popupDelay = 5 }: NewsletterPopupProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const hasSeenPopup = localStorage.getItem('hasSeenNewsletterPopup');
-    if (!hasSeenPopup) {
-      const delay = Math.floor(Math.random() * 2000) + 3000; // 3 to 5 seconds
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, delay);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+    const delay = popupDelay * 1000;
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [popupDelay]);
 
   const handleClose = () => {
     setIsOpen(false);
-    localStorage.setItem('hasSeenNewsletterPopup', 'true');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +37,6 @@ export function NewsletterPopup() {
     } else {
       setStatus('success');
       setMessage('Successfully subscribed!');
-      localStorage.setItem('hasSeenNewsletterPopup', 'true');
       setTimeout(() => {
         setIsOpen(false);
       }, 2000);

@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Job } from '@/types/job';
 
-const AD_URL = 'https://omg10.com/4/10835370';
-const COUNTDOWN_SECONDS = 5;
+const AD_URL = process.env.NEXT_PUBLIC_AD_URL || 'https://omg10.com/4/10835370';
+const COUNTDOWN_SECONDS = Number(process.env.NEXT_PUBLIC_AD_COUNTDOWN) || 5;
 
 interface AdUnlockButtonProps {
   job: Job;
@@ -26,11 +26,14 @@ export function AdUnlockButton({ job, onUnlock }: AdUnlockButtonProps) {
   }, []);
 
   const handleLockClick = () => {
-    try {
-      window.open(AD_URL, '_blank', 'noopener,noreferrer');
-    } catch (e) {
-      // Handle error silently
-    }
+    // Use anchor click to bypass popup blockers (stays trusted in user gesture context)
+    const a = document.createElement('a');
+    a.href = AD_URL;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
     setState('counting');
     setCountdown(COUNTDOWN_SECONDS);
@@ -138,7 +141,7 @@ export function AdUnlockButton({ job, onUnlock }: AdUnlockButtonProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
         )}
       </svg>
-      {isPrivate ? 'SEND CV / RESUME' : 'APPLY ON WEBSITE'}
+      {isPrivate ? 'SEND CV / RESUME' : 'APPLY NOW'}
     </a>
   );
 }

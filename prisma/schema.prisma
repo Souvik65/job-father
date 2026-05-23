@@ -204,3 +204,11 @@ model NewsletterSubscriber {
   email     String   @unique
   createdAt DateTime @default(now())
 }
+
+// Key-value store for site-wide settings (one row per unique key)
+model SiteSettings {
+  key       String   @id  // e.g. "subscriptionPopup", "popupDelay", "fabEnabled", "portalName"
+  value     String
+  updatedAt DateTime @updatedAt
+}
+

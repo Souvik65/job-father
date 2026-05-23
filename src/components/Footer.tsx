@@ -1,6 +1,10 @@
 'use client';
 
-export function Footer() {
+interface FooterProps {
+  portalName?: string;
+}
+
+export function Footer({ portalName = 'JOBFATHER' }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -10,7 +14,7 @@ export function Footer() {
           NOT AFFILIATED WITH ANY GOVT.
         </p>
         <p className="font-bold tracking-wider uppercase text-slate-500 text-[9px]">
-          © {currentYear} JOBFATHER
+          © {currentYear} {portalName}
         </p>
       </div>
     </footer>

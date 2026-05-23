@@ -9,39 +9,45 @@ const lato = Lato({
   variable: "--font-lato" 
 });
 
-export const metadata: Metadata = {
-  title: "Jobfather | Latest Govt Job Updates, Mock Test & TPSC Vacancies 2026",
-  description:
-    "Jobfather – Your one-stop portal for the latest government job updates in Tripura, TPSC notifications, police, teaching, JRBT, free mock tests and exam alerts.",
-  keywords:
-    "Tripura government jobs, TPSC, JRBT, Tripura police recruitment, teaching jobs Tripura, latest job updates Tripura 2026, mock test Tripura, jobfather",
-  authors: [{ name: "Jobfather" }],
-  creator: "Jobfather",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: siteConfig.baseUrl,
-    siteName: "Jobfather",
-    title: "Jobfather | Latest Govt Job Updates & Mock Test 2026",
-    description: "Find the latest TPSC, police, teaching & private job notifications for Tripura.",
-    images: [
-      {
-        url: `${siteConfig.baseUrl}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: "Jobfather",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary",
-    title: "Jobfather | Latest Govt Job Updates 2026",
-    description: "Find the latest TPSC, police, teaching & private job notifications for Tripura.",
-  },
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+import { getPortalName } from '@/lib/settings';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const portalName = await getPortalName();
+  
+  return {
+    title: `${portalName} | Latest Govt Job Updates, Mock Test & TPSC Vacancies 2026`,
+    description:
+      `${portalName} – Your one-stop portal for the latest government job updates in Tripura, TPSC notifications, police, teaching, JRBT, free mock tests and exam alerts.`,
+    keywords:
+      `Tripura government jobs, TPSC, JRBT, Tripura police recruitment, teaching jobs Tripura, latest job updates Tripura 2026, mock test Tripura, ${portalName.toLowerCase()}`,
+    authors: [{ name: portalName }],
+    creator: portalName,
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: siteConfig.baseUrl,
+      siteName: portalName,
+      title: `${portalName} | Latest Govt Job Updates & Mock Test 2026`,
+      description: "Find the latest TPSC, police, teaching & private job notifications for Tripura.",
+      images: [
+        {
+          url: `${siteConfig.baseUrl}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: portalName,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary",
+      title: `${portalName} | Latest Govt Job Updates 2026`,
+      description: "Find the latest TPSC, police, teaching & private job notifications for Tripura.",
+    },
+    icons: {
+      icon: "/favicon.ico",
+    },
+  };
+}
 
 export default function RootLayout({
   children,

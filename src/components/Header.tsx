@@ -3,13 +3,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-export function Header() {
+interface HeaderProps {
+  portalName?: string;
+}
+
+export function Header({ portalName = 'JOBFATHER' }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-[#111c2e]/90 backdrop-blur-md shadow-lg border-b border-white/10 select-none transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Brand logo - matches the picture (plain bold white uppercase text, no box) */}
-        <Link href="/" className="font-extrabold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 tracking-widest font-sans flex items-center gap-1 hover:scale-105 transition-transform duration-300 cursor-pointer">
-          JOBFATHER
+        <Link href="/" className="font-extrabold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 tracking-widest font-sans flex items-center gap-1 hover:scale-105 transition-transform duration-300 cursor-pointer uppercase">
+          {portalName}
         </Link>
 
         {/* Right buttons */}

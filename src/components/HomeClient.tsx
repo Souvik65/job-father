@@ -11,15 +11,20 @@ import { AdSlot } from '@/components/AdSlot';
 import { Toast } from '@/components/Toast';
 import { buildShareText } from '@/lib/utils';
 import { Job } from '@/types/job';
+import { Category } from '@prisma/client';
+
+export type CategoryWithAll = Category | 'ALL';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 interface HomeClientProps {
   initialJobs: Job[];
-  initialCategories: string[];
+  initialCategories: CategoryWithAll[];
+  portalName?: string;
+  fabEnabled?: boolean;
 }
 
-function HomeClientInner({ initialJobs, initialCategories }: HomeClientProps) {
-  const [activeCategory, setActiveCategory] = useState('ALL');
+function HomeClientInner({ initialJobs, initialCategories, portalName, fabEnabled }: HomeClientProps) {
+  const [activeCategory, setActiveCategory] = useState<CategoryWithAll>('ALL');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -90,7 +95,7 @@ function HomeClientInner({ initialJobs, initialCategories }: HomeClientProps) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+      <Header portalName={portalName} />
 
       {/* Home Banner Ad */}
       <AdSlot id="homeBannerAd" className="h-24" />
@@ -99,7 +104,7 @@ function HomeClientInner({ initialJobs, initialCategories }: HomeClientProps) {
       <CategoryNav
         categories={initialCategories.filter(c => c !== 'ALL')}
         activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
+        onCategoryChange={(cat) => setActiveCategory(cat as CategoryWithAll)}
       />
 
       {/* Main Content */}
@@ -113,7 +118,7 @@ function HomeClientInner({ initialJobs, initialCategories }: HomeClientProps) {
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer portalName={portalName} />
 
       {/* Job Detail Overlay */}
       <JobDetailOverlay
@@ -123,16 +128,18 @@ function HomeClientInner({ initialJobs, initialCategories }: HomeClientProps) {
       />
 
       {/* Post Job Floating Button - matches bottom right in the picture */}
-      <Link
-        href="/post-job"
-        className="fixed bottom-6 right-6 px-5 py-3.5 bg-[#ff7315] text-white rounded-2xl shadow-xl hover:bg-[#e66712] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest z-40 select-none border border-[#ff8e3c]/40"
-        aria-label="Post a Private Job"
-      >
-        <svg className="w-4 h-4 stroke-current" fill="none" strokeWidth="3" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        <span>POST A JOB</span>
-      </Link>
+      {fabEnabled && (
+        <Link
+          href="/post-job"
+          className="fixed bottom-6 right-6 px-5 py-3.5 bg-[#ff7315] text-white rounded-2xl shadow-xl hover:bg-[#e66712] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest z-40 select-none border border-[#ff8e3c]/40"
+          aria-label="Post a Private Job"
+        >
+          <svg className="w-4 h-4 stroke-current" fill="none" strokeWidth="3" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          <span>POST A JOB</span>
+        </Link>
+      )}
 
       {/* Toast */}
       <Toast 
