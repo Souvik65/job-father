@@ -4,10 +4,12 @@ import { formatDate, jobUrl, buildShareText } from '@/lib/utils';
 import Link from 'next/link';
 
 interface JobPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
+
+export const dynamicParams = true;
 
 // Generate static params for all jobs
 export async function generateStaticParams() {
@@ -19,7 +21,8 @@ export async function generateStaticParams() {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: JobPageProps): Promise<Metadata> {
-  const job = await getJobBySlug(params.slug);
+  const { slug } = await params;
+  const job = await getJobBySlug(slug);
 
   if (!job) {
     return {
@@ -48,7 +51,8 @@ export async function generateMetadata({ params }: JobPageProps): Promise<Metada
 }
 
 export default async function JobPage({ params }: JobPageProps) {
-  const job = await getJobBySlug(params.slug);
+  const { slug } = await params;
+  const job = await getJobBySlug(slug);
 
   if (!job) {
     return (

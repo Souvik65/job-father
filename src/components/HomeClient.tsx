@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { CategoryNav } from '@/components/CategoryNav';
 import { JobList } from '@/components/JobList';
 import { JobDetailOverlay } from '@/components/JobDetailOverlay';
-import { PostJobPopup } from '@/components/PostJobPopup';
 import { AdSlot } from '@/components/AdSlot';
 import { Toast } from '@/components/Toast';
 import { buildShareText } from '@/lib/utils';
@@ -22,7 +22,6 @@ function HomeClientInner({ initialJobs, initialCategories }: HomeClientProps) {
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [overlayOpen, setOverlayOpen] = useState(false);
-  const [popupOpen, setPopupOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   
@@ -123,20 +122,17 @@ function HomeClientInner({ initialJobs, initialCategories }: HomeClientProps) {
         onClose={handleCloseOverlay}
       />
 
-      {/* Post Job Popup */}
-      <PostJobPopup open={popupOpen} onClose={() => setPopupOpen(false)} />
-
-      {/* Post Job Floating Button */}
-      <button
-        onClick={() => setPopupOpen(true)}
-        className="fixed bottom-6 right-6 px-4 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition flex items-center gap-2 font-medium z-40"
+      {/* Post Job Floating Button - matches bottom right in the picture */}
+      <Link
+        href="/post-job"
+        className="fixed bottom-6 right-6 px-5 py-3.5 bg-[#ff7315] text-white rounded-2xl shadow-xl hover:bg-[#e66712] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest z-40 select-none border border-[#ff8e3c]/40"
         aria-label="Post a Private Job"
       >
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        <svg className="w-4 h-4 stroke-current" fill="none" strokeWidth="3" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
-        <span className="hidden sm:inline">POST A JOB</span>
-      </button>
+        <span>POST A JOB</span>
+      </Link>
 
       {/* Toast */}
       <Toast 

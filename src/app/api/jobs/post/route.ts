@@ -3,12 +3,37 @@ import { PostJobFormData } from '@/types/job';
 import { slugify } from '@/lib/utils';
 import { Category } from '@prisma/client';
 
+const sanitize = (str: string | undefined | null) => {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, (match) => {
+    const escape: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+    return escape[match];
+  });
+};
+
 export async function POST(request: Request) {
   try {
-    const formData: PostJobFormData = await request.json();
+    const body = await request.json();
+    const formData: PostJobFormData = body;
+    const screenshot = body.screenshot; // base64 payload
+    const screenshotName = body.screenshotName || 'payment_screenshot.png';
+
+    // Validate screenshot size (e.g., max 5MB base64 ≈ 6.8MB actual)
+    if (screenshot && screenshot.length > 5 * 1024 * 1024 * 1.37) {
+      return Response.json(
+        { success: false, error: 'Screenshot file too large (max 5MB)' },
+        { status: 400 }
+      );
+    }
 
     // Validate required fields
-    if (!formData.title || !formData.category || !formData.fromDate || !formData.untilDate) {
+    if (!formData.title || !formData.fromDate || !formData.untilDate) {
       return Response.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
@@ -19,6 +44,19 @@ export async function POST(request: Request) {
     const baseSlug = slugify(formData.title);
     const slug = `${baseSlug}-${Date.now()}`;
 
+    // Structure description with employer and payment details
+    const structuredDescription = `
+${sanitize(formData.description)}
+
+--- Employer Contact Info ---
+Email: ${sanitize(formData.contactEmail) || 'N/A'}
+Phone: ${sanitize(formData.contactPhone) || 'N/A'}
+
+--- Payment Info (Manual UPI) ---
+Screenshot Submitted: ${screenshot ? 'Yes' : 'No'}
+File Name: ${sanitize(screenshotName)}
+`;
+
     // Create the job in database
     const job = await prisma.job.create({
       data: {
@@ -26,10 +64,12 @@ export async function POST(request: Request) {
         slug,
         organization: 'Private Employer',
         category: Category.PRIVATE,
-        description: formData.description,
+        description: structuredDescription.trim(),
         sourceUrl: '#', // Placeholder for private jobs
+        applyUrl: formData.contactEmail || null, // Used for Send CV/Resume mailto
         isPrivate: true,
         isVerified: false, // Needs manual approval
+        paymentScreenshot: screenshot || null,
         timeline: {
           create: {
             applicationStart: new Date(formData.fromDate),
@@ -56,6 +96,8 @@ export async function POST(request: Request) {
           body: JSON.stringify({
             type: 'postJob',
             jobId: job.id,
+            screenshot,
+            screenshotName,
             ...formData,
           }),
         });
@@ -71,7 +113,7 @@ export async function POST(request: Request) {
     return Response.json(
       {
         success: true,
-        message: 'Job submitted successfully! It will appear after review.',
+        message: 'Job listing submitted successfully! It will appear online after manual review.',
         data: {
           id: job.id,
           title: job.title,

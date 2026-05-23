@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 type Mode = 'login' | 'register';
 
-export default function AuthPage() {
+function AuthPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') ?? '/';
@@ -125,7 +125,7 @@ export default function AuthPage() {
                 placeholder="Ramesh Kumar"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                className="w-full border text-black bg-gray-100 border-gray-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
           )}
@@ -143,7 +143,7 @@ export default function AuthPage() {
               placeholder="you@example.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="w-full border text-black bg-gray-100 border-gray-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             />
           </div>
 
@@ -160,7 +160,7 @@ export default function AuthPage() {
               placeholder={mode === 'register' ? 'Min. 8 characters' : '••••••••'}
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="w-full border text-black bg-gray-100 border-gray-500 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             />
           </div>
 
@@ -189,5 +189,13 @@ export default function AuthPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center px-4"><div className="animate-spin rounded-full h-8 w-8 border-4 border-slate-200 border-t-blue-600"></div></div>}>
+      <AuthPageInner />
+    </Suspense>
   );
 }
