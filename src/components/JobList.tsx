@@ -13,9 +13,26 @@ interface JobListProps {
 export function JobList({ jobs, loading = false, onJobClick, onJobShare }: JobListProps) {
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 bg-white border border-slate-200 select-none">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-100 border-t-[#ff7315]"></div>
-        <p className="mt-4 text-xs font-black uppercase tracking-widest text-slate-500">Loading jobs...</p>
+      <div className="space-y-3" aria-hidden="true">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="border border-slate-100 shadow-sm rounded-xl bg-white select-none overflow-hidden animate-pulse">
+            <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              {/* Job info skeleton */}
+              <div className="flex-1 space-y-3">
+                <div className="h-5 bg-slate-200 rounded-md w-3/4"></div>
+                <div className="flex gap-2">
+                  <div className="h-5 bg-slate-200 rounded-md w-16"></div>
+                  <div className="h-5 bg-slate-200 rounded-md w-24"></div>
+                </div>
+              </div>
+              {/* Action buttons skeleton */}
+              <div className="flex gap-2 shrink-0">
+                <div className="h-8 bg-slate-200 rounded-md w-16"></div>
+                <div className="h-8 bg-slate-200 rounded-md w-20"></div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

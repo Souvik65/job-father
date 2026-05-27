@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Lato } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
@@ -49,18 +49,28 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
+  themeColor: '#111c2e',
+};
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const portalName = await getPortalName();
+
   return (
     <html lang="en" className={`h-full scroll-smooth ${lato.variable}`} data-scroll-behavior="smooth">
       <head>
-        <meta name="theme-color" content="#2563eb" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Jobfather" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content={portalName} />
         <link rel="canonical" href={siteConfig.baseUrl} />
         <link
           rel="stylesheet"
@@ -72,7 +82,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0"
         />
       </head>
-      <body className={`min-h-full flex flex-col antialiased bg-slate-50 ${lato.className}`}>{children}</body>
+      <body className={`min-h-full flex flex-col antialiased bg-slate-50 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300 ${lato.className}`}>{children}</body>
     </html>
   );
 }

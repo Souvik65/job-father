@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -8,6 +10,18 @@
   --color-success: #16a34a;
   --color-warning: #ea580c;
   --color-danger: #dc2626;
+
+  /* Neumorphism design tokens for admin mobile nav */
+  --neu-bg: #e8ecf0;
+  --neu-shadow-light: #ffffff;
+  --neu-shadow-dark: #c8ccd0;
+  --neu-active-color: #ff7315;
+  --neu-text: #5a6270;
+  --neu-text-active: #ff7315;
+
+  /* Safe area insets for notched devices */
+  --sai-bottom: env(safe-area-inset-bottom, 0px);
+  --sai-top: env(safe-area-inset-top, 0px);
 }
 
 /* Scrollbar styling */
@@ -60,3 +74,113 @@ textarea,
 body {
   color: var(--foreground);
 }
+
+/* ───────────────────────────────────────────────
+   SKELETON SHIMMER ANIMATION
+   ─────────────────────────────────────────────── */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #e2e8f0 25%,
+    #f1f5f9 50%,
+    #e2e8f0 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite linear;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #1e293b 25%,
+    #334155 50%,
+    #1e293b 75%
+  );
+}
+
+/* ───────────────────────────────────────────────
+   NEUMORPHISM UTILITIES (Admin Mobile Bottom Nav)
+   ─────────────────────────────────────────────── */
+.neu-surface {
+  background: var(--neu-bg);
+  box-shadow:
+    6px 6px 12px var(--neu-shadow-dark),
+    -6px -6px 12px var(--neu-shadow-light);
+}
+
+.neu-pressed {
+  background: var(--neu-bg);
+  box-shadow:
+    inset 4px 4px 8px var(--neu-shadow-dark),
+    inset -4px -4px 8px var(--neu-shadow-light);
+}
+
+.neu-btn {
+  background: var(--neu-bg);
+  box-shadow:
+    4px 4px 8px var(--neu-shadow-dark),
+    -4px -4px 8px var(--neu-shadow-light);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.neu-btn:active,
+.neu-btn.active {
+  box-shadow:
+    inset 3px 3px 6px var(--neu-shadow-dark),
+    inset -3px -3px 6px var(--neu-shadow-light);
+  transform: scale(0.97);
+}
+
+/* ───────────────────────────────────────────────
+   SAFE AREA PADDING HELPERS (notched phones)
+   ─────────────────────────────────────────────── */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+.pt-safe {
+  padding-top: max(0px, env(safe-area-inset-top, 0px));
+}
+
+/* Bottom nav height clearance for mobile content */
+.mb-bottom-nav {
+  margin-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* ───────────────────────────────────────────────
+   MOBILE TOUCH IMPROVEMENTS
+   ─────────────────────────────────────────────── */
+/* Ensure minimum 44px touch targets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Remove 300ms tap delay on interactive elements */
+button,
+[role="button"],
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+/* Prevent text selection on interactive elements */
+button, [role="button"], a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ───────────────────────────────────────────────
+   RESPONSIVE TYPOGRAPHY SCALE
+   ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  h1 { font-size: clamp(1.25rem, 5vw, 1.875rem); }
+  h2 { font-size: clamp(1.1rem, 4vw, 1.5rem); }
+}
+

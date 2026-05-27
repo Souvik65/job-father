@@ -26,7 +26,7 @@ export function CategoryNav({
     <div className="bg-[#ff7315] w-full border-none select-none overflow-x-auto scrollbar-hide">
       <nav
         ref={navRef}
-        className="max-w-7xl mx-auto flex items-stretch h-12 "
+        className="w-full flex items-stretch h-12"
         aria-label="Job categories"
       >
         <button

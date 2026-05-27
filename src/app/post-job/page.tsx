@@ -15,6 +15,7 @@ export default function PostJobPage() {
   const [description, setDescription] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
+  const [totalVacancies, setTotalVacancies] = useState('');
   
   // Date default computation (today & 8 days later)
   const getFormattedDate = (date: Date) => {
@@ -193,6 +194,7 @@ export default function PostJobPage() {
           description,
           contactEmail,
           contactPhone,
+          totalVacancies: totalVacancies ? parseInt(totalVacancies, 10) : null,
           screenshot: screenshotBase64,
           screenshotName,
         }),
@@ -379,6 +381,26 @@ export default function PostJobPage() {
                         ⚠️ {phoneError}
                       </p>
                     )}
+                  </div>
+
+                  {/* Total Vacancies */}
+                  <div>
+                    <label className="font-bold text-[10px] text-[#475569] tracking-widest mb-1.5 uppercase block">
+                      Total Vacancies
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 5, 10 (Leave blank if not specified)"
+                      value={totalVacancies}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '' || parseInt(val, 10) >= 0) {
+                          setTotalVacancies(val);
+                        }
+                      }}
+                      min="0"
+                      className="w-full px-4 py-3 bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-black font-semibold placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-orange-500/15 focus:border-[#EA580C] focus:bg-white transition-all text-sm shadow-sm"
+                    />
                   </div>
 
                   {/* Date Grid */}

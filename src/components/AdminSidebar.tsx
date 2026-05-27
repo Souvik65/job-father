@@ -36,7 +36,7 @@ export function AdminSidebar({ portalName = 'JobFather' }: AdminSidebarProps) {
         </div>
         <div>
           <div className="text-base font-bold text-[#000666] uppercase">{portalName} Admin</div>
-          <div className="text-[11px] text-[#454652]">Institutional Command</div>
+          
         </div>
       </div>
 

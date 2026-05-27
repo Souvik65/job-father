@@ -133,7 +133,7 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
   };
 
   return (
-    <div className="flex-1 p-6 overflow-y-auto">
+    <div className="space-y-6">
       {/* Page Header Section */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-[#000666] mb-1">Subscribers Management</h1>
@@ -256,7 +256,7 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
                       <button 
                         onClick={() => handleDelete(sub.id)}
                         disabled={isPending}
-                        className="text-[#454652] hover:text-[#ba1a1a] transition-colors p-1.5 rounded-full hover:bg-[#ffdad6]/50 opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-50" 
+                        className="text-[#454652] hover:text-[#ba1a1a] transition-colors p-1.5 rounded-full hover:bg-[#ffdad6]/50 disabled:opacity-50" 
                         title="Delete Subscriber"
                       >
                         <span className="material-symbols-outlined text-[20px]">delete</span>

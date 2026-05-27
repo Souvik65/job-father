@@ -12,6 +12,7 @@ export interface PostJobFormData {
   description?: string;
   contactEmail?: string;
   contactPhone?: string;
+  totalVacancies?: number;
   attachments?: File[];
 }
 

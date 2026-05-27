@@ -57,6 +57,15 @@ Screenshot Submitted: ${screenshot ? 'Yes' : 'No'}
 File Name: ${sanitize(screenshotName)}
 `;
 
+    // Parse and validate totalVacancies
+    let totalVacancies: number | null = null;
+    if (formData.totalVacancies) {
+      const parsed = parseInt(String(formData.totalVacancies), 10);
+      if (!isNaN(parsed) && parsed >= 0) {
+        totalVacancies = parsed;
+      }
+    }
+
     // Create the job in database
     const job = await prisma.job.create({
       data: {
@@ -64,6 +73,7 @@ File Name: ${sanitize(screenshotName)}
         slug,
         organization: 'Private Employer',
         category: Category.PRIVATE,
+        totalVacancies,
         description: structuredDescription.trim(),
         sourceUrl: '#', // Placeholder for private jobs
         applyUrl: formData.contactEmail || null, // Used for Send CV/Resume mailto

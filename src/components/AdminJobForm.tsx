@@ -33,7 +33,7 @@ export function AdminJobForm({ job }: { job?: Job }) {
     return new Date(date).toISOString().split('T')[0];
   };
 
-  const inputClass = "w-full border text-slate-400 bg-slate-50 border-slate-400 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff7315] focus:border-transparent transition";
+  const inputClass = "w-full border text-slate-800 bg-slate-50 border-slate-400 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff7315] focus:border-transparent transition";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-sm border border-slate-200">
