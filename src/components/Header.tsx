@@ -24,7 +24,7 @@ export function Header({ portalName = "JOBFATHER" }: HeaderProps) {
           {/* Mock Test Button */}
           <Link
             href="/mock-tests"
-            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 bg-[#f0975ce1] hover:bg-[#e66712] text-white text-[9px] sm:text-xs font-black uppercase rounded-lg tracking-wider transition-colors shadow-sm min-h-[38px] sm:min-h-[40px]"
+            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 bg-[#ee6f14] hover:bg-[#d5580e] text-white text-[9px] sm:text-xs font-black uppercase rounded-lg tracking-wider transition-colors shadow-sm min-h-[38px] sm:min-h-[40px]"
             title="Mock Tests"
           >
             <Image
