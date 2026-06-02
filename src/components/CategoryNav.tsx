@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 interface CategoryNavProps {
   categories: string[];
@@ -18,26 +18,30 @@ export function CategoryNav({
   useEffect(() => {
     const activeBtn = navRef.current?.querySelector('[data-active="true"]');
     if (activeBtn) {
-      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      activeBtn.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
     }
   }, [activeCategory]);
 
   return (
-    <div className="bg-[#ff7315] w-full border-none select-none overflow-x-auto scrollbar-hide">
+    <div className="bg-[#ee6f14] w-full border-none select-none overflow-x-auto scrollbar-hide">
       <nav
         ref={navRef}
         className="w-full flex items-stretch h-12"
         aria-label="Job categories"
       >
         <button
-          onClick={() => onCategoryChange('ALL')}
-          data-active={activeCategory === 'ALL'}
+          onClick={() => onCategoryChange("ALL")}
+          data-active={activeCategory === "ALL"}
           className={`px-6 h-full flex items-center justify-center font-black text-xs uppercase tracking-widest transition-colors cursor-pointer ${
-            activeCategory === 'ALL'
-              ? 'bg-white text-[#ff7315]'
-              : 'bg-[#f17726dd] text-white hover:bg-[#e66712]'
+            activeCategory === "ALL"
+              ? "bg-white text-[#ee6f14]"
+              : "bg-[#ee6f14] text-white hover:bg-[#d5580e]"
           }`}
-          aria-pressed={activeCategory === 'ALL'}
+          aria-pressed={activeCategory === "ALL"}
         >
           ALL JOBS
         </button>
@@ -48,8 +52,8 @@ export function CategoryNav({
             data-active={activeCategory === cat}
             className={`px-6 h-full flex items-center justify-center font-black text-xs uppercase tracking-widest transition-colors cursor-pointer ${
               activeCategory === cat
-                ? 'bg-white text-[#ff7315]'
-                : 'bg-[#f17726dd] text-white hover:bg-[#e66712]'
+                ? "bg-white text-[#ee6f14]"
+                : "bg-[#ee6f14] text-white hover:bg-[#d5580e]"
             }`}
             aria-pressed={activeCategory === cat}
           >

@@ -15,9 +15,9 @@
   --neu-bg: #e8ecf0;
   --neu-shadow-light: #ffffff;
   --neu-shadow-dark: #c8ccd0;
-  --neu-active-color: #ff7315;
+  --neu-active-color: #ee6f14;
   --neu-text: #5a6270;
-  --neu-text-active: #ff7315;
+  --neu-text-active: #ee6f14;
 
   /* Safe area insets for notched devices */
   --sai-bottom: env(safe-area-inset-bottom, 0px);
