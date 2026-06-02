@@ -67,12 +67,12 @@ textarea,
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --font-sans: var(--font-lato), sans-serif;
 }
-
-
 
 body {
   color: var(--foreground);
+  font-family: var(--font-lato), sans-serif;
 }
 
 /* ───────────────────────────────────────────────
@@ -184,3 +184,32 @@ button, [role="button"], a {
   h2 { font-size: clamp(1.1rem, 4vw, 1.5rem); }
 }
 
+/* ───────────────────────────────────────────────
+   MOCK TEST PAGE ANIMATIONS
+   ─────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeUp {
+  animation: fadeUp 0.3s ease forwards;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.25s ease forwards;
+}
+
+.animate-slideDown {
+  animation: slideDown 0.2s ease forwards;
+}

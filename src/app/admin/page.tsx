@@ -18,6 +18,15 @@ export default async function AdminDashboard() {
     include: { timeline: true },
   });
 
+  // Get pending upgrade requests
+  const pendingUpgradeRequests = await prisma.upgradeRequest.findMany({
+    where: { status: 'PENDING' },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      user: { select: { id: true, name: true, email: true, mockTestPlan: true } },
+    },
+  });
+
   // Get recent verified jobs for the table (limit to 10)
   const recentJobs = await prisma.job.findMany({
     where: { isVerified: true },
@@ -26,13 +35,16 @@ export default async function AdminDashboard() {
     take: 10,
   });
 
-  // Get recent newsletter subscribers for the "Recent Subscribers" table (limit to 5)
-  const recentSubscribers = await prisma.newsletterSubscriber.findMany({
+  // Get recent registered users (mock-test users) for the "Recent Users" table (limit to 5)
+  const recentSubscribers = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
     take: 5,
     select: {
       email: true,
+      name: true,
+      role: true,
       createdAt: true,
+      _count: { select: { mockTestResults: true } },
     },
   });
 
@@ -97,7 +109,7 @@ export default async function AdminDashboard() {
         <section className="bg-amber-50 border border-amber-200 rounded-xl p-4 sm:p-6 shadow-sm">
           <div className="flex items-center gap-2 text-amber-800 mb-4 border-b border-amber-200 pb-2">
             <span className="material-symbols-outlined text-amber-600">gavel</span>
-            <h2 className="text-lg font-bold">Pending Review ({pendingJobs.length})</h2>
+            <h2 className="text-lg font-bold">Pending Job Review ({pendingJobs.length})</h2>
           </div>
           <div className="grid gap-4">
             {pendingJobs.map((job) => (
@@ -202,6 +214,54 @@ export default async function AdminDashboard() {
         </section>
       )}
 
+      {/* Pending Upgrade Requests Section */}
+      {pendingUpgradeRequests.length > 0 && (
+        <section className="bg-blue-50 border border-blue-200 rounded-xl p-4 sm:p-6 shadow-sm">
+          <div className="flex items-center gap-2 text-blue-800 mb-4 border-b border-blue-200 pb-2">
+            <span className="material-symbols-outlined text-blue-600">star_rate</span>
+            <h2 className="text-lg font-bold">Pending Upgrade Requests ({pendingUpgradeRequests.length})</h2>
+            <Link
+              href="/admin/upgrade-requests"
+              className="ml-auto text-[10px] font-black uppercase tracking-wider text-blue-600 hover:underline"
+            >
+              View All →
+            </Link>
+          </div>
+          <div className="grid gap-4">
+            {pendingUpgradeRequests.map((req) => (
+              <div
+                key={req.id}
+                className="bg-white p-4 sm:p-5 rounded-lg border border-blue-200 shadow-sm flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+              >
+                {/* User Info */}
+                <div className="flex flex-col min-w-0 flex-1 w-full">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold px-2.5 py-1 bg-orange-100 text-orange-600 rounded-md uppercase">
+                      {req.planId} PLAN
+                    </span>
+                    <span className="text-xs text-slate-400">
+                      {new Date(req.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-slate-800 text-[17px] truncate">{req.user.name || 'Unknown User'}</h3>
+                  <p className="text-[15px] text-slate-500 truncate">{req.user.email}</p>
+                  <p className="text-[13px] text-slate-400 mt-1">Current plan: {req.user.mockTestPlan || 'free'}</p>
+                </div>
+
+                {/* Quick actions — link to full page */}
+                <Link
+                  href="/admin/upgrade-requests"
+                  className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-xs transition shadow-sm flex items-center gap-1 touch-target cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm">manage_accounts</span>
+                  Review
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Tables Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Jobs Table (Left column, spanning 2 grid columns) */}
@@ -262,7 +322,7 @@ export default async function AdminDashboard() {
         {/* Recent Subscribers Table (Right column, spanning 1 grid column) */}
         <div className="bg-white border border-[#c6c5d4] rounded-xl overflow-hidden shadow-sm flex flex-col">
           <div className="p-4 border-b border-[#c6c5d4] bg-[#f3f3f3] flex justify-between items-center">
-            <h3 className="font-bold text-base text-[#000666]">Recent Subscribers</h3>
+            <h3 className="font-bold text-base text-[#000666]">Recent Users</h3>
             <span className="text-xs text-[#454652] font-medium">Top 5</span>
           </div>
           <div className="overflow-x-auto flex-1">
@@ -270,23 +330,28 @@ export default async function AdminDashboard() {
               <thead className="bg-[#eeeeee] text-[#454652] text-xs font-semibold border-b border-[#c6c5d4]">
                 <tr>
                   <th className="py-3 px-4 font-semibold">Email</th>
-                  <th className="py-3 px-4 font-semibold text-right">Subscribed At</th>
+                  <th className="py-3 px-4 font-semibold">Tests</th>
+                  <th className="py-3 px-4 font-semibold text-right">Joined</th>
                 </tr>
               </thead>
               <tbody className="text-sm divide-y divide-[#c6c5d4]">
                 {recentSubscribers.length === 0 ? (
                   <tr>
-                    <td colSpan={2} className="py-8 px-4 text-center text-[#454652]">
-                      No newsletter subscribers yet.
+                    <td colSpan={3} className="py-8 px-4 text-center text-[#454652]">
+                      No registered users yet.
                     </td>
                   </tr>
                 ) : (
-                  recentSubscribers.map((subscriber: { email: string; createdAt: Date }) => (
+                  recentSubscribers.map((subscriber) => (
                     <tr key={subscriber.email} className="hover:bg-[#f9f9f9] transition-colors">
-                      <td className="py-4 px-4 text-[#1a1c1c] font-medium truncate max-w-[140px]" title={subscriber.email}>
-                        {subscriber.email}
+                      <td className="py-3 px-4 text-[#1a1c1c] font-medium truncate max-w-[130px]" title={subscriber.email}>
+                        <div className="truncate">{subscriber.email}</div>
+                        {subscriber.name && <div className="text-[#454652] text-xs truncate">{subscriber.name}</div>}
                       </td>
-                      <td className="py-4 px-4 text-[#454652] text-right text-xs">
+                      <td className="py-3 px-4 text-[#454652] text-center font-bold">
+                        {subscriber._count.mockTestResults}
+                      </td>
+                      <td className="py-3 px-4 text-[#454652] text-right text-xs">
                         {formatDate(subscriber.createdAt)}
                       </td>
                     </tr>

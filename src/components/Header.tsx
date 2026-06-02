@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
 interface HeaderProps {
   portalName?: string;
 }
 
-export function Header({ portalName = 'JOBFATHER' }: HeaderProps) {
+export function Header({ portalName = "JOBFATHER" }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-[#111c2e]/90 backdrop-blur-md border-b border-white/10 select-none transition-all duration-300 pt-safe">
       <div className="w-full px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
