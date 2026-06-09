@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { subscribeNewsletter } from '@/app/actions';
+import { Mail } from 'lucide-react';
 
 interface NewsletterPopupProps {
   popupDelay?: number;
@@ -82,7 +83,7 @@ export function NewsletterPopup({ popupDelay = 5 }: NewsletterPopupProps) {
         
         <div className="p-8 text-center">
           <div className="mx-auto w-16 h-16 bg-blue-100 dark:bg-blue-950/40 rounded-full flex items-center justify-center mb-4">
-            <span className="material-symbols-outlined text-blue-600 dark:text-blue-400 text-3xl">mail</span>
+            <Mail className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
           
           <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">Stay Updated!</h2>

@@ -21,6 +21,7 @@ export function ProfileMenu({
 }: ProfileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -35,11 +36,23 @@ export function ProfileMenu({
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setShowLogoutConfirm(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!showLogoutConfirm) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowLogoutConfirm(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showLogoutConfirm]);
 
   const getPlanName = (plan: string) => {
     if (plan === "3m") return "3 Months (Pro)";
@@ -102,7 +115,12 @@ export function ProfileMenu({
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          if (isOpen) {
+            setShowLogoutConfirm(false);
+          }
+        }}
         className="flex items-center justify-center w-8.5 h-8.5 rounded-2xl bg-slate-100 dark:bg-white/7 border border-slate-200 dark:border-white/12 text-slate-600 dark:text-white/70 hover:bg-slate-200 dark:hover:bg-white/15 transition-colors"
       >
         <User />
@@ -193,12 +211,32 @@ export function ProfileMenu({
           </div>
 
           <div className="p-2 border-t border-slate-100 dark:border-white/10">
-            <button
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-extrabold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors border border-dashed border-red-200 dark:border-red-500/20 cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" /> Log Out
-            </button>
+            {showLogoutConfirm ? (
+              <div className="flex flex-col gap-2 p-2 bg-red-50/50 dark:bg-red-950/20 rounded-lg border border-red-100 dark:border-red-950/30 text-center animate-fadeUp">
+                <p className="text-xs font-bold text-red-600 dark:text-red-400">Are you sure you want to log out?</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="flex-1 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-extrabold rounded-md transition-colors cursor-pointer"
+                  >
+                    Yes, Log Out
+                  </button>
+                  <button
+                    onClick={() => setShowLogoutConfirm(false)}
+                    className="flex-1 py-1.5 bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-white text-xs font-extrabold rounded-md transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLogoutConfirm(true)}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-extrabold text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors border border-dashed border-red-200 dark:border-red-500/20 cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" /> Log Out
+              </button>
+            )}
           </div>
 
           <div className="border-t border-slate-100 dark:border-white/10 p-2 bg-slate-50 dark:bg-white/5 flex items-center justify-between">
