@@ -1,5 +1,6 @@
 "use client";
 
+import { FilePenLine } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,59 +10,63 @@ interface HeaderProps {
 
 export function Header({ portalName = "JOBFATHER" }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 bg-[#111c2e]/90 backdrop-blur-md border-b border-white/10 select-none transition-all duration-300 pt-safe">
-      <div className="w-full px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2">
-        {/* Brand logo */}
-        <Link
-          href="/"
-          className="font-extrabold text-lg sm:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 tracking-widest font-sans flex items-center gap-1 hover:scale-105 transition-transform duration-300 cursor-pointer uppercase shrink-0"
-        >
+    <header
+      className="
+        sticky top-0 z-50 select-none shrink-0
+        bg-[#0d1b2a]
+        border-b-[2.5px] border-orange-500
+        px-4 sm:px-6
+        h-[58px]
+        flex items-center justify-between gap-4
+        shadow-lg
+        pt-safe
+      "
+    >
+      {/* Brand logo */}
+      <Link
+        href="/"
+        className="flex items-center gap-2 hover:scale-[1.02] transition-transform duration-200"
+      >
+        <span className="font-extrabold text-[18px] sm:text-[24px] tracking-wider text-white leading-none uppercase">
           {portalName}
+        </span>
+      </Link>
+
+      {/* Right buttons */}
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        {/* Mock Test button */}
+        <Link
+          href="/mock-tests"
+          className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-[#ee6f14] hover:bg-[#d5580e] text-white text-[10px] sm:text-xs font-bold uppercase rounded-md tracking-wider transition-colors shadow-sm min-h-7 sm:min-h-8"
+          title="Mock Tests"
+        >
+          <FilePenLine className="shrink-0 w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">MOCK TEST</span>
+          <span className="sm:hidden">TEST</span>
         </Link>
 
-        {/* Right buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Mock Test Button */}
+        {/* Job Alert button */}
+        {process.env.NEXT_PUBLIC_WHATSAPP_NUMBER && (
           <Link
-            href="/mock-tests"
-            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 bg-[#ee6f14] hover:bg-[#d5580e] text-white text-[9px] sm:text-xs font-black uppercase rounded-lg tracking-wider transition-colors shadow-sm min-h-[38px] sm:min-h-[40px]"
-            title="Mock Tests"
+            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp Job Alert"
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-[#10b981] hover:bg-[#059669] text-white text-[10px] sm:text-xs font-bold uppercase rounded-md tracking-wider transition-colors shadow-sm min-h-7 sm:min-h-8"
+            title="WhatsApp Group Alert"
           >
             <Image
-              src="/mock.svg"
+              src="/whatsapp.svg"
               alt=""
               aria-hidden="true"
               width={14}
               height={14}
-              className="shrink-0"
+              className="shrink-0 w-3.5 h-3.5 sm:w-4 sm:h-4"
             />
-            <span className="hidden sm:inline">MOCK TEST</span>
-            <span className="sm:hidden">TEST</span>
+            <span className="hidden sm:inline">JOB ALERT</span>
+            <span className="sm:hidden">ALERT</span>
           </Link>
-
-          {/* Job Alert Button */}
-          {process.env.NEXT_PUBLIC_WHATSAPP_NUMBER && (
-            <Link
-              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="WhatsApp Job Alert"
-              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 bg-[#10b981] hover:bg-[#059669] text-white text-[9px] sm:text-xs font-black uppercase rounded-lg tracking-wider transition-colors shadow-sm min-h-[38px] sm:min-h-[40px]"
-              title="WhatsApp Group Alert"
-            >
-              <Image
-                src="/whatsapp.svg"
-                alt=""
-                aria-hidden="true"
-                width={15}
-                height={15}
-                className="shrink-0 sm:w-5 sm:h-5"
-              />
-              <span className="hidden sm:inline">JOB ALERT</span>
-              <span className="sm:hidden">ALERT</span>
-            </Link>
-          )}
-        </div>
+        )}
       </div>
     </header>
   );

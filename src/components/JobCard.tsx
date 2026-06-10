@@ -2,6 +2,7 @@
 
 import { Job } from '@/types/job';
 import { formatDate } from '@/lib/utils';
+import { Eye, Share2 } from 'lucide-react';
 
 interface JobCardProps {
   job: Job;
@@ -11,60 +12,114 @@ interface JobCardProps {
 
 export function JobCard({ job, onViewClick, onShareClick }: JobCardProps) {
   return (
-    <div className="border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl bg-white dark:bg-slate-900 hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-300 select-none overflow-hidden">
-      <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-        {/* Job info */}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm sm:text-base md:text-lg leading-snug line-clamp-2 sm:truncate">
-            {job.title}
-          </h3>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {/* Category Tag */}
-            <span className="px-2.5 py-1 bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border border-orange-200/60 dark:border-orange-900/40 text-[10px] font-black uppercase tracking-wider rounded">
-              {job.category}
-            </span>
+    <div
+      className="
+        grid border-b border-[#e8edf5] dark:border-white/[0.07]
+        border-l-[3px] border-l-transparent
+        hover:bg-[#fff7ed] dark:hover:bg-orange-500/4
+        hover:border-l-[#f97316]
+        transition-colors duration-150
+        bg-white dark:bg-[#111d2e]
+        select-none
+        py-3 sm:py-3
+      "
+      style={{ gridTemplateColumns: '1fr 96px' }}
+    >
+      {/* Left — job info */}
+      <div className="py-3.25 pl-4 pr-2.5 min-w-0">
+        <h3
+          className="font-bold text-[#1e293b] dark:text-slate-100 leading-[1.35] mb-1.5 truncate"
+          style={{ fontSize: '14px' }}
+        >
+          {job.title}
+        </h3>
 
-            {/* Date Tag */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-900/40 text-[10px] font-black uppercase tracking-wider rounded">
-              <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <span>{formatDate(job.timeline?.applicationEnd || null)}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-2 shrink-0 items-center">
-          {/* VIEW Button */}
-          <button
-            onClick={() => onViewClick?.(job)}
-            className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-2 bg-[#1e293b] dark:bg-orange-600 hover:bg-[#0f172a] dark:hover:bg-orange-700 text-white text-[10px] font-black uppercase tracking-wider rounded-md transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 touch-target"
-            aria-label={`View ${job.title}`}
+        <div className="flex flex-wrap items-center gap-1.25">
+          {/* Category pill */}
+          <span
+            className="inline-flex items-center font-black uppercase text-[#c2410c] dark:text-orange-400 bg-[#fff7ed] dark:bg-orange-950/30 border border-[#fed7aa] dark:border-orange-800/40 rounded-[20px]"
+            style={{ fontSize: '9px', letterSpacing: '0.5px', padding: '2px 8px' }}
           >
-            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            <span>VIEW</span>
-          </button>
+            {job.category}
+          </span>
 
-          {/* SHARE Button */}
-          <button
-            onClick={() => onShareClick?.(job)}
-            className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-350 text-[10px] font-black uppercase tracking-wider rounded-md transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 touch-target"
-            aria-label={`Share ${job.title}`}
+          {/* Date pill */}
+          <span
+            className="inline-flex items-center gap-1 font-bold uppercase text-[#dc2626] dark:text-red-400 bg-[#fff0f0] dark:bg-red-950/30 border border-[#fecaca] dark:border-red-800/40 rounded-[20px]"
+            style={{ fontSize: '9.5px', letterSpacing: '0.4px', padding: '2px 8px' }}
           >
-            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 10.742l5.263-2.63m0 7.776l-5.263-2.63m1.263-.842a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zm7.5-6.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zm0 13a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0z" />
+            {/* Calendar icon */}
+            <svg
+              className="shrink-0"
+              style={{ width: '9px', height: '9px' }}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
-            <span>SHARE</span>
-          </button>
+            {formatDate(job.timeline?.applicationEnd || null)}
+          </span>
         </div>
+      </div>
+
+      {/* Right — details cell */}
+      <div
+        className="flex flex-col items-center justify-center"
+        style={{ gap: '6px', padding: '0 10px 0 4px' }}
+      >
+        {/* VIEW button */}
+        <button
+          onClick={() => onViewClick?.(job)}
+          className="
+            inline-flex items-center justify-center gap-1.25
+            bg-[#1e293b] hover:bg-[#0f172a]
+            dark:bg-[#1e293b] dark:hover:bg-[#0f172a]
+            text-white
+            border border-[#1e293b]
+            rounded-md
+            font-bold uppercase tracking-[0.6px]
+            cursor-pointer
+            shadow-[0_1px_3px_rgba(0,0,0,0.18)]
+            active:translate-y-px active:shadow-inner
+            transition-transform duration-100
+          "
+          style={{ height: '30px', width: '76px', fontSize: '9.5px' }}
+          aria-label={`View ${job.title}`}
+        >
+          {/* Eye icon */}
+          <Eye size={12} strokeWidth={2} aria-hidden="true" />
+          VIEW
+        </button>
+
+        {/* SHARE button */}
+        <button
+          onClick={() => onShareClick?.(job)}
+          className="
+            inline-flex items-center justify-center gap-1.25
+            bg-transparent hover:bg-slate-50
+            dark:hover:bg-white/5
+            text-[#64748b] dark:text-slate-400
+            border border-[#cbd5e1] dark:border-white/15
+            rounded-md
+            font-bold uppercase tracking-[0.5px]
+            cursor-pointer
+            active:translate-y-px
+            transition-transform duration-100
+          "
+          style={{ height: '26px', width: '76px', fontSize: '9px' }}
+          aria-label={`Share ${job.title}`}
+        >
+          {/* Share icon */}
+          <Share2 size={12} strokeWidth={2} aria-hidden="true" />
+          SHARE
+        </button>
       </div>
     </div>
   );

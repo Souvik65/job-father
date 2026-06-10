@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Check, X, Clock, ArrowLeft, CreditCard, ReceiptText, Eye, Download } from "lucide-react";
 
 type UpgradeRequest = {
@@ -19,6 +18,19 @@ type UpgradeRequest = {
     mockTestPlan: string;
   };
 };
+
+function isSafeImageUrl(url: string | null): boolean {
+  if (!url) return false;
+  try {
+    if (url.startsWith("/") || url.startsWith("./") || url.startsWith("../")) {
+      return true;
+    }
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 export default function UpgradeRequestsPage() {
   const [requests, setRequests] = useState<UpgradeRequest[]>([]);
@@ -159,12 +171,11 @@ export default function UpgradeRequestsPage() {
                         <span className="text-[9px] text-slate-400 font-bold leading-tight">No Preview</span>
                       </div>
                     ) : (
-                      <Image
-                        src={req.screenshotUrl}
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={isSafeImageUrl(req.screenshotUrl) ? req.screenshotUrl : ""}
                         alt="Payment Screenshot"
-                        fill
-                        className="object-cover"
-                        unoptimized
+                        className="absolute inset-0 w-full h-full object-cover"
                         onError={() => {
                           setFailedImages((prev) => ({ ...prev, [req.id]: true }));
                         }}
@@ -181,8 +192,8 @@ export default function UpgradeRequestsPage() {
                       View
                     </button>
                     <a
-                      href={req.screenshotUrl}
-                      download={`Payment_Screenshot_${req.user.name || 'User'}`}
+                      href={isSafeImageUrl(req.screenshotUrl) ? req.screenshotUrl : "#"}
+                      download={`Payment_Screenshot_${(req.user.name || "User").replace(/[^a-zA-Z0-9_-]/g, "_")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-4 py-2 bg-[#00004d] text-white hover:bg-blue-950 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
@@ -241,12 +252,11 @@ export default function UpgradeRequestsPage() {
                 <p className="text-sm font-semibold text-slate-300">Unable to load payment screenshot preview.</p>
               </div>
             ) : (
-              <Image
-                src={selectedImage}
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={isSafeImageUrl(selectedImage) ? selectedImage : ""}
                 alt="Payment Screenshot Preview"
-                fill
-                className="object-contain rounded-xl"
-                unoptimized
+                className="max-w-full max-h-full object-contain rounded-xl"
                 onError={() => setModalImageFailed(true)}
               />
             )}

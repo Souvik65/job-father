@@ -132,13 +132,13 @@ export function MockTestLayoutClient({
   return (
     <div className="flex flex-col h-screen overflow-hidden text-slate-800 dark:text-slate-100 font-sans transition-colors duration-200">
       {/* HEADER SECTION */}
-      <header className="sticky top-0 z-40 bg-[#0d1b2a] border-b-[2.5px] border-orange-500 px-4 sm:px-6 h-14.5 flex items-center justify-between gap-4 shadow-lg select-none shrink-0 pt-safe">
+      <header className="sticky top-0 z-40 bg-[#0d1b2a] border-b-[2.5px] border-orange-500 px-4 sm:px-6 h-[58px] flex items-center justify-between gap-4 shadow-lg select-none shrink-0 pt-safe">
         <Link
           href="/"
           className="flex items-center gap-2 hover:scale-102 transition-transform duration-200"
         >
           <div className="flex flex-col">
-            <span className="font-extrabold text-[20px] sm:text-[28px] tracking-wider text-white leading-none">
+            <span className="font-extrabold text-[18px] sm:text-[24px] tracking-wider text-white leading-none">
               JOBFATHER
             </span>
           </div>
@@ -150,10 +150,10 @@ export function MockTestLayoutClient({
             {/* Mock Test Button */}
             <Link
               href="/"
-              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 bg-[#ee6f14] hover:bg-[#d5580e] text-white text-[9px] sm:text-xs font-black uppercase rounded-lg tracking-wider transition-colors shadow-sm min-h-[28px] sm:min-h-[32px]"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-[#ee6f14] hover:bg-[#d5580e] text-white text-[10px] sm:text-xs font-bold uppercase rounded-md tracking-wider transition-colors shadow-sm min-h-7 sm:min-h-8"
               title="Go Back"
             >
-              <ArrowBigLeftDashIcon className="shrink-0 w-4 h-4 sm:w-5 sm:h-5" />
+              <ArrowBigLeftDashIcon className="shrink-0 w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Go Back</span>
               <span className="sm:hidden">BACK</span>
             </Link>
@@ -165,16 +165,16 @@ export function MockTestLayoutClient({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp Job Alert"
-                className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 bg-[#10b981] hover:bg-[#059669] text-white text-[9px] sm:text-xs font-black uppercase rounded-lg tracking-wider transition-colors shadow-sm min-h-[28px] sm:min-h-[30px]"
+                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-[#10b981] hover:bg-[#059669] text-white text-[10px] sm:text-xs font-bold uppercase rounded-md tracking-wider transition-colors shadow-sm min-h-7 sm:min-h-8"
                 title="WhatsApp Group Alert"
               >
                 <Image
                   src="/whatsapp.svg"
                   alt="whatsapp"
                   aria-hidden="true"
-                  width={18}
-                  height={18}
-                  className="shrink-0"
+                  width={14}
+                  height={14}
+                  className="shrink-0 w-3.5 h-3.5 sm:w-4 sm:h-4"
                 />
                 <span className="hidden sm:inline">JOB ALERT</span>
                 <span className="sm:hidden">ALERT</span>
@@ -214,7 +214,7 @@ export function MockTestLayoutClient({
 
           <div className="flex-1 overflow-y-auto py-2 flex flex-col gap-1.5">
             <Link href="/mock-tests" className={getButtonClass("/mock-tests")}>
-              <LayoutDashboard className="w-4 h-4 shrink-0" /> Home
+              <LayoutDashboard className="w-4 h-4 shrink-0" /> Dashboard
             </Link>
 
             <Link
@@ -263,14 +263,14 @@ export function MockTestLayoutClient({
       </div>
 
       {/* MOBILE BOTTOM NAVIGATION BAR */}
-      <nav className="fixed bottom-0 left-0 right-0 h-14.5 bg-[#0d1b2a] border-t border-white/7 flex md:hidden items-center justify-around z-40 select-none pb-safe">
+      <nav className="fixed bottom-0 left-0 right-0 h-[58px] bg-[#0d1b2a] border-t border-white/7 flex md:hidden items-center justify-around z-40 select-none pb-safe">
         <Link
           href="/mock-tests"
           className={getMobileButtonClass("/mock-tests")}
         >
           <LayoutDashboard className="w-4.5 h-4.5" />
           <span className="text-[8px] font-black uppercase tracking-wider">
-            Home
+            Dashboard
           </span>
         </Link>
         <Link

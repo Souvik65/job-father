@@ -2,14 +2,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { AdType, AdPosition } from '@prisma/client';
 import { saveAd } from '../actions';
-
-const POSITION_LABELS: Record<AdPosition, string> = {
-  HEADER_TOP:       'Header Top (Leaderboard)',
-  INLINE_AFTER_3RD: 'Inline After 3rd Job',
-  SIDEBAR_STICKY:   'Sidebar Sticky',
-  FOOTER_BANNER:    'Footer Banner',
-  JOB_DETAIL_TOP:   'Job Detail Top',
-};
+import { POSITION_DETAILS } from '@/lib/adConstants';
 
 export default function CreateAdPage() {
   return (
@@ -76,8 +69,8 @@ export default function CreateAdPage() {
               defaultValue={AdPosition.INLINE_AFTER_3RD}
               className="w-full h-10 px-4 rounded-lg border border-[#c6c5d4] text-sm text-[#1a1c1c] focus:border-[#000666] focus:ring-1 focus:ring-[#000666] outline-none transition"
             >
-              {Object.entries(POSITION_LABELS).map(([val, label]) => (
-                <option key={val} value={val}>{label}</option>
+              {Object.entries(POSITION_DETAILS).map(([val, detail]) => (
+                <option key={val} value={val}>{detail.label}</option>
               ))}
             </select>
           </div>

@@ -4,6 +4,8 @@ import { jobUrl, buildShareText } from '@/lib/utils';
 import { getSiteSettings } from '@/lib/settings';
 import { JobDetailPage } from '@/components/JobDetailPage';
 import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import { AdPosition } from '@prisma/client';
 
 interface JobPageProps {
   params: Promise<{
@@ -71,9 +73,14 @@ export default async function JobPage({ params }: JobPageProps) {
     );
   }
 
+  const jobDetailAd = await prisma.ad.findFirst({
+    where: { isActive: true, position: AdPosition.JOB_DETAIL_TOP },
+    orderBy: { createdAt: 'desc' }
+  });
+
   const portalName = settings.portalName || 'Jobfather';
 
   return (
-    <JobDetailPage job={job} portalName={portalName} />
+    <JobDetailPage job={job} portalName={portalName} jobDetailAd={jobDetailAd} />
   );
 }

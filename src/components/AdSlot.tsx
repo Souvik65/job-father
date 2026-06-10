@@ -1,50 +1,59 @@
-'use client';
-
-import Image from 'next/image';
-import { useSyncExternalStore } from 'react';
-
-const emptySubscribe = () => () => {};
+import { Ad } from '@prisma/client';
 
 interface AdSlotProps {
   id: string;
+  ad?: Ad | null;
   className?: string;
 }
 
-export function AdSlot({ id, className = '' }: AdSlotProps) {
-  const mounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  );
+function isSafeUrl(url: string): boolean {
+  try {
+    if (url.startsWith('//')) {
+      return false;
+    }
+    if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) {
+      return true;
+    }
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
 
-  if (!mounted) {
-    return (
-      <div className={`bg-gray-100 rounded-lg flex items-center justify-center ${className}`}>
-        <div className="flex flex-col items-center justify-center py-2">
-          <Image 
-            src="/advertisement.svg"
-            alt="advertisement"
-            width={32}
-            height={32}
-            className='mx-auto mb-1 opacity-50'
-          />
-          <p className="text-gray-500 text-xs font-medium">Advertisement Slot</p>
-        </div>
+export function AdSlot({ id, ad, className = '' }: AdSlotProps) {
+  if (!ad) return null;
+
+  if (ad.type === 'CUSTOM' && ad.imageUrl) {
+    const AdContent = (
+      <div id={id} className={`relative block overflow-hidden bg-gray-100 ${className}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img 
+          src={ad.imageUrl}
+          alt={ad.label}
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
       </div>
     );
+    
+    if (ad.targetUrl && isSafeUrl(ad.targetUrl)) {
+      return (
+        <a href={ad.targetUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
+          {AdContent}
+        </a>
+      );
+    }
+    
+    return AdContent;
   }
+
+  // Fallback for Google AdSense or missing image
   return (
-    <div id={id} className={`bg-gray-100 rounded-lg flex items-center justify-center ${className}`}>
-      <div className="flex flex-col items-center justify-center py-2">
-        <Image 
-          src="/advertisement.svg"
-          alt="advertisement"
-          width={32}
-          height={32}
-          className='mx-auto mb-1 opacity-50'
-        />
-        <p className="text-gray-500 text-xs font-medium">Advertisement Slot</p>
-      </div>
+    <div id={id} className={`bg-gray-100 flex items-center justify-center ${className}`}>
+      <span className="text-xs text-gray-500 font-medium">Advertisement</span>
     </div>
   );
 }
