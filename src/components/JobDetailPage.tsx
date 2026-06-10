@@ -8,15 +8,19 @@ import { DateCard } from "./DateCard";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import Link from "next/link";
+import { AdSlot } from "./AdSlot";
+import { Ad } from "@prisma/client";
 
 interface JobDetailPageProps {
   job: Job;
   portalName?: string;
+  jobDetailAd?: Ad | null;
 }
 
 export function JobDetailPage({
   job,
   portalName = "Jobfather",
+  jobDetailAd,
 }: JobDetailPageProps) {
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -87,6 +91,14 @@ export function JobDetailPage({
         <div className="w-full flex flex-col-reverse md:flex-row gap-4 sm:gap-6 items-start">
           {/* ── Left column ── */}
           <div className="w-full md:w-2/3 flex flex-col gap-6">
+            
+            {/* AdSlot at the top of the job detail content */}
+            {jobDetailAd && (
+              <div className="w-full">
+                <AdSlot id="jobDetailTopAd" ad={jobDetailAd} className="h-24 sm:h-28 w-full" />
+              </div>
+            )}
+
             {/* Job Header card */}
             <section className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 flex flex-col gap-3 shadow-sm">
               {/* Chips */}

@@ -20,11 +20,11 @@ const SUBJECTS = [
 ];
 
 const BOOKS = [
-  { id: 1, subj: 'math', name: 'Fast Track Objective Arithmetic', author: 'Rajesh Verma', desc: 'Best for SSC/Banking Maths. Covers all topics with shortcuts.', link: 'https://amazon.in', tag: 'Bestseller' },
-  { id: 2, subj: 'reasoning', name: 'Verbal & Non-Verbal Reasoning', author: 'R.S. Aggarwal', desc: 'Complete reasoning with 5000+ questions for all competitive exams.', link: 'https://amazon.in', tag: 'Top Rated' },
-  { id: 3, subj: 'english', name: 'Objective General English', author: 'S.P. Bakshi', desc: 'Grammar, comprehension, vocabulary for SSC, IBPS, RRB and more.', link: 'https://amazon.in', tag: 'Popular' },
-  { id: 4, subj: 'gk', name: 'Manorama Yearbook 2026', author: 'Manorama', desc: 'Complete general awareness and current affairs for all govt exams.', link: 'https://amazon.in', tag: 'Must Have' },
-  { id: 5, subj: 'pyq', name: '25 Years SSC Chapterwise Solved Papers', author: 'Arihant Experts', desc: 'Previous year questions with detailed solutions for SSC CGL/CHSL.', link: 'https://amazon.in', tag: 'Recommended' }
+  { id: 1, subj: 'math', name: 'Fast Track Objective Arithmetic', author: 'Rajesh Verma', desc: 'Best for SSC/Banking Maths. Covers all topics with shortcuts.', link: 'https://www.amazon.in/s?k=Fast+Track+Objective+Arithmetic+Rajesh+Verma', tag: 'Bestseller' },
+  { id: 2, subj: 'reasoning', name: 'Verbal & Non-Verbal Reasoning', author: 'R.S. Aggarwal', desc: 'Complete reasoning with 5000+ questions for all competitive exams.', link: 'https://www.amazon.in/s?k=Verbal+and+Non-Verbal+Reasoning+R.S.+Aggarwal', tag: 'Top Rated' },
+  { id: 3, subj: 'english', name: 'Objective General English', author: 'S.P. Bakshi', desc: 'Grammar, comprehension, vocabulary for SSC, IBPS, RRB and more.', link: 'https://www.amazon.in/s?k=Objective+General+English+S.P.+Bakshi', tag: 'Popular' },
+  { id: 4, subj: 'gk', name: 'Manorama Yearbook 2026', author: 'Manorama', desc: 'Complete general awareness and current affairs for all govt exams.', link: 'https://www.amazon.in/s?k=Manorama+Yearbook+2026', tag: 'Must Have' },
+  { id: 5, subj: 'pyq', name: '25 Years SSC Chapterwise Solved Papers', author: 'Arihant Experts', desc: 'Previous year questions with detailed solutions for SSC CGL/CHSL.', link: 'https://www.amazon.in/s?k=25+Years+SSC+Chapterwise+Solved+Papers+Arihant+Experts', tag: 'Recommended' }
 ];
 
 const QUOTES = [
@@ -42,7 +42,6 @@ const QUOTES = [
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Activity, CheckCircle2, Flame, Target } from 'lucide-react';
-import Link from 'next/link';
 
 interface PrepBook {
   id: string | number;
@@ -60,21 +59,6 @@ export default function MockTestsDashboardPage() {
   const [userPlan, setUserPlan] = useState<'free' | 'premium'>('free');
   const [streak, setStreak] = useState<number>(0);
   const [booksList, setBooksList] = useState<PrepBook[]>(BOOKS);
-  const [recommendation, setRecommendation] = useState<{
-    weakSubjectId: string | null;
-    weakSubjectName: string | null;
-    recommendedBook: PrepBook | null;
-    accuracy: number | null;
-    reason: string;
-  } | null>(null);
-  const [roadmap, setRoadmap] = useState<{
-    id: number;
-    title: string;
-    ph: string;
-    stat: string;
-    status: 'done' | 'active' | 'locked';
-    prog?: number;
-  }[]>([]);
 
   const [examName, setExamName] = useState('SSC CGL');
   const [examDate, setExamDate] = useState('2026-12-15');
@@ -129,7 +113,6 @@ export default function MockTestsDashboardPage() {
               setDbState(data.db || {});
               setUserPlan(data.plan || 'free');
               setStreak(data.streak || 0);
-              if (data.roadmap) setRoadmap(data.roadmap);
             }
           })
           .catch(err => {
@@ -144,7 +127,6 @@ export default function MockTestsDashboardPage() {
       .then(res => res.json())
       .then(data => {
         if (data.books) setBooksList(data.books);
-        if (data.recommendation) setRecommendation(data.recommendation);
       })
       .catch(err => {
         if (err.name !== 'AbortError') console.error(err);
@@ -187,6 +169,35 @@ export default function MockTestsDashboardPage() {
   });
 
   const weekAccuracy = weekMaxTotal > 0 ? Math.round((weekScoreTotal / weekMaxTotal) * 100) : 0;
+  
+  // Calculate weakest subject based on local analytics
+  let weakestSubject: typeof SUBJECTS[0] | null = null;
+  let lowestAccuracy = Infinity;
+  let hasAnalytics = false;
+
+  for (const s of SUBJECTS) {
+    let subScore = 0;
+    let subMax = 0;
+    for (const d of weekDays) {
+      if (dbState[d] && dbState[d][s.id]) {
+        subScore += dbState[d][s.id].score;
+        subMax += dbState[d][s.id].max;
+        hasAnalytics = true;
+      }
+    }
+    if (subMax > 0) {
+      const accuracy = (subScore / subMax) * 100;
+      if (accuracy < lowestAccuracy) {
+        lowestAccuracy = accuracy;
+        weakestSubject = s;
+      }
+    }
+  }
+
+  const recommendedBook = hasAnalytics && weakestSubject
+    ? booksList.find(b => b.subj === weakestSubject!.id) || BOOKS.find(b => b.subj === weakestSubject!.id)
+    : null;
+
   const todayRecords = dbState[todayKey()] || {};
   let todayDone = 0;
   let todayScore = 0;
@@ -441,111 +452,34 @@ export default function MockTestsDashboardPage() {
         </div>
       </div>
 
-      {/* Subject Roadmap */}
-      <div className="flex items-center justify-between gap-4 mt-2">
-        <span className="text-[10px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase flex items-center gap-2 w-full">
-          Subject Roadmap <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
-        </span>
-      </div>
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2 select-none">
-        {(roadmap.length > 0 ? roadmap : [
-          { id: 1, title: 'Beginner', ph: 'Phase 1', stat: '0%', status: 'active', prog: 0 },
-          { id: 2, title: 'Foundation', ph: 'Phase 2', stat: 'Locked', status: 'locked' },
-          { id: 3, title: 'Intermediate', ph: 'Phase 3', stat: 'Locked', status: 'locked' },
-          { id: 4, title: 'Advanced', ph: 'Phase 4', stat: 'Locked', status: 'locked' },
-          { id: 5, title: 'Expert', ph: 'Phase 5', stat: 'Locked', status: 'locked' },
-          { id: 6, title: 'Final Revision', ph: 'Phase 6', stat: 'Locked', status: 'locked' }
-        ]).map(rm => (
-          <div key={rm.id} className={`relative shrink-0 min-w-32.5 p-3 rounded-[10px] border bg-white dark:bg-[#111d2e] shadow-sm overflow-hidden flex flex-col
-            ${rm.status === 'done' ? 'border-green-500' : rm.status === 'active' ? 'border-orange-500' : 'border-slate-200 dark:border-slate-800 opacity-60'}`}>
-            <span className="text-[7.5px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">{rm.ph}</span>
-            <span className="text-xs font-extrabold text-slate-800 dark:text-white">{rm.title}</span>
-            <span className={`text-[9.5px] font-extrabold mt-2 ${rm.status === 'done' ? 'text-green-500' : rm.status === 'active' ? 'text-orange-500' : 'text-slate-400 dark:text-slate-500'}`}>
-              {rm.stat}
-            </span>
-            {rm.status === 'active' && rm.prog !== undefined && (
-              <div className="absolute bottom-0 left-0 h-0.75 bg-orange-500 transition-all duration-300" style={{ width: `${rm.prog}%` }} />
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Subjects Quick Navigation */}
-      <div>
-        <span className="text-[10px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase flex items-center gap-2 w-full mb-3">
-          Quick Start Test <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
-        </span>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
-          {SUBJECTS.map(s => {
-            const records = dbState[todayKey()] || {};
-            const done = !!records[s.id];
-            const score = done ? records[s.id].score : 0;
-            const max = done ? records[s.id].max : 0;
-            const pct = max > 0 ? Math.round((score / max) * 100) : 0;
-
-            return (
-              <Link
-                key={s.id}
-                href={`/mock-tests/start-test?subject=${s.id}`}
-                className={`bg-white dark:bg-[#111d2e] rounded-xl p-3.5 border ${done ? 'border-green-500/40 animate-fadeUp' : 'border-slate-200 dark:border-slate-800'} hover:border-orange-500 dark:hover:border-orange-500 hover:-translate-y-0.5 hover:shadow-md cursor-pointer transition-all flex flex-col gap-3 group relative overflow-hidden min-h-[140px] justify-between`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800/40 flex items-center justify-center text-xl shrink-0 transition-all group-hover:scale-105 duration-200 shadow-sm">
-                    {s.icon}
-                  </div>
-                  <span className={`text-[8.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 ${done ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
-                    {done ? 'Completed' : 'Start'}
-                  </span>
-                </div>
-                <div className="flex-1 flex flex-col justify-end mt-1">
-                  <span className="block font-black text-xs sm:text-[13px] text-slate-800 dark:text-white leading-tight mb-1">
-                    {s.name}
-                  </span>
-                  <span className="block text-[9.5px] font-bold text-slate-400">
-                    {done ? `${score}/${max} (${pct}%)` : `${userPlan !== 'free' ? 10 : 3} Questions`}
-                  </span>
-                </div>
-                <div className="h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shrink-0">
-                  <div style={{ width: `${pct}%` }} className={`h-full ${done ? 'bg-green-500' : 'bg-linear-to-r from-orange-500 to-amber-400'}`} />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+   
 
       {/* Weak subject or performance-based book recommendation card */}
-      {recommendation?.recommendedBook && (
+      {hasAnalytics && recommendedBook && weakestSubject && (
         <div className="bg-white dark:bg-[#111d2e] rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-colors">
           <div>
-            <div className={`rounded-full px-3 py-0.5 text-[8.5px] font-black uppercase tracking-wider w-fit mb-2 ${
-              recommendation.weakSubjectId 
-                ? 'bg-red-500/10 text-red-500' 
-                : 'bg-orange-500/10 text-orange-500'
-            }`}>
-              {recommendation.weakSubjectId 
-                ? `⚠️ Weak Subject: ${recommendation.weakSubjectName}` 
-                : '💡 Recommended Prep Book'}
+            <div className="rounded-full px-3 py-0.5 text-[8.5px] font-black uppercase tracking-wider w-fit mb-2 bg-red-500/10 text-red-500">
+              ⚠️ Weak Subject: {weakestSubject.name}
             </div>
             <span className="block font-black text-[15px] text-slate-800 dark:text-white leading-tight">
-              {recommendation.recommendedBook.name}
+              {recommendedBook.name}
             </span>
             <span className="block text-xs font-semibold text-slate-400 mt-1 leading-normal">
-              by {recommendation.recommendedBook.author} • {recommendation.recommendedBook.desc || recommendation.reason}
+              by {recommendedBook.author} • {recommendedBook.desc}
             </span>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <a
-              href={recommendation.recommendedBook.link}
+              href={recommendedBook.link}
               target="_blank"
               rel="noreferrer"
               className="bg-orange-500 hover:bg-orange-600 active:scale-98 text-white text-[10px] font-extrabold tracking-wider uppercase px-4 py-2.5 rounded-lg shadow-md transition-all flex items-center gap-1.5"
             >
               🛒 Buy Amazon
             </a>
-            {recommendation.recommendedBook.tag && (
+            {recommendedBook.tag && (
               <span className="text-[10px] font-bold text-green-500 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded">
-                {recommendation.recommendedBook.tag}
+                {recommendedBook.tag}
               </span>
             )}
           </div>

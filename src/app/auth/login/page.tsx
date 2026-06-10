@@ -4,7 +4,7 @@ import { useState, useTransition, Suspense, useRef, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { CircleUser, Eye, EyeOff } from 'lucide-react';
 
 type Mode = 'login' | 'register';
 
@@ -99,9 +99,7 @@ function AuthPageInner() {
         {/* Header Section */}
         <div className="px-8 pt-8 pb-6 text-center border-b border-slate-100 dark:border-white/5">
           <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:scale-105 transition-transform duration-300">
-            <svg className="w-8 h-8 text-[#ee6f14]" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-            </svg>
+            <CircleUser className="w-8 h-8 text-[#ee6f14]" />
             <span className="font-extrabold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-500 dark:from-white dark:to-gray-400 tracking-widest uppercase">
               Jobfather
             </span>

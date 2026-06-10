@@ -1,16 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
-import { AdType, AdPosition } from '@prisma/client';
+import { AdType } from '@prisma/client';
 import { saveAd } from '../actions';
-
-const POSITION_LABELS: Record<AdPosition, string> = {
-  HEADER_TOP:       'Header Top (Leaderboard)',
-  INLINE_AFTER_3RD: 'Inline After 3rd Job',
-  SIDEBAR_STICKY:   'Sidebar Sticky',
-  FOOTER_BANNER:    'Footer Banner',
-  JOB_DETAIL_TOP:   'Job Detail Top',
-};
+import { POSITION_DETAILS } from '@/lib/adConstants';
 
 export default async function EditAdPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -77,9 +70,13 @@ export default async function EditAdPage({ params }: { params: Promise<{ id: str
               defaultValue={ad.position}
               className="w-full h-10 px-4 rounded-lg border border-[#c6c5d4] text-sm text-[#1a1c1c] focus:border-[#000666] focus:ring-1 focus:ring-[#000666] outline-none transition"
             >
-              {Object.entries(POSITION_LABELS).map(([val, label]) => (
-                <option key={val} value={val}>{label}</option>
+              {Object.entries(POSITION_DETAILS).map(([val, detail]) => (
+                <option key={val} value={val}>{detail.label}</option>
               ))}
+              {/* Render option for legacy/deprecated positions so the field is visible and editable */}
+              {!Object.prototype.hasOwnProperty.call(POSITION_DETAILS, ad.position) && (
+                <option value={ad.position}>Legacy: {ad.position}</option>
+              )}
             </select>
           </div>
 
