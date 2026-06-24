@@ -23,14 +23,14 @@ export default async function AdminLayout({
       {/* Desktop Sidebar — hidden on mobile */}
       <AdminSidebar portalName={portalName} />
 
-      {/* Mobile Bottom Nav — hidden on md+ */}
-      <AdminMobileNav />
-
       {/* Main Content Area */}
       <div className="md:pl-64 flex flex-col min-h-screen">
         {/* TopAppBar */}
         <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-[#c6c5d4] dark:border-slate-800 flex justify-between items-center h-14 md:h-16 px-4 md:px-6 shrink-0">
-          <div className="flex items-center gap-3 md:gap-4 min-w-0">
+          <div className="flex items-center gap-2 md:gap-4 min-w-0">
+            {/* Hamburger menu for mobile view */}
+            <AdminMobileNav />
+
             {/* Mobile Title — hidden on desktop */}
             <h2 className="text-base font-extrabold text-[#000666] dark:text-blue-400 uppercase truncate md:hidden">
               {portalName.toUpperCase() === 'JOBFATHER' ? 'JOBFATHER ADMIN' : `${portalName.toUpperCase()} ADMIN`}
@@ -40,7 +40,7 @@ export default async function AdminLayout({
               {portalName.toLowerCase() === 'jobfather' ? 'JobFather Admin Portal' : `${portalName} Admin Portal`}
             </h2>
           </div>
-          {/* Back to Site Button — visible only on mobile viewports */}
+          {/* Back to Site Button — visible only on mobile viewports
           <Link
             href="/"
             className="md:hidden flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#c6c5d4] dark:border-slate-800 hover:bg-[#f1f5f9] dark:hover:bg-slate-850 text-[#454652] dark:text-slate-300 text-xs font-bold uppercase tracking-wider transition touch-target"
@@ -50,11 +50,11 @@ export default async function AdminLayout({
               arrow_back
             </span>
             <span>Back to Site</span>
-          </Link>
+          </Link> */}
         </header>
 
-        {/* Main Content Wrapper — extra pb on mobile for bottom nav */}
-        <main className="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:pb-6">
+        {/* Main Content Wrapper */}
+        <main className="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto pb-6">
           {children}
         </main>
       </div>

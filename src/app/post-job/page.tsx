@@ -235,7 +235,7 @@ export default function PostJobPage() {
             <span className="text-[#475569] font-black text-xs uppercase tracking-wider block mb-2">
               PROMOTE YOUR BRAND
             </span>
-            <p className="text-[11px] text-[#64748B] font-semibold leading-relaxed max-w-[180px]">
+            <p className="text-[11px] text-[#64748B] font-semibold leading-relaxed max-w-45">
               Reach thousands of employers and job hunters daily in Tripura. Contact ad manager.
             </p>
           </div>
@@ -523,7 +523,7 @@ export default function PostJobPage() {
                         {/* QR Code */}
                         <div className="bg-white p-3 rounded-2xl border border-[#BFDBFE] shadow-sm hover:scale-105 transition-transform duration-300 inline-block">
                           {qrError ? (
-                            <div className="w-[160px] h-[160px] flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg">
+                            <div className="w-40 h-40 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg">
                               <p className="text-[10px] text-gray-500 text-center px-4">
                                 QR code unavailable.<br/>Please use the UPI ID below.
                               </p>
@@ -587,14 +587,14 @@ export default function PostJobPage() {
                     <label className="font-bold text-[10px] text-[#475569] tracking-widest mb-1.5 uppercase block">
                       Upload Payment Screenshot *
                     </label>
-                    <div className="border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC] hover:bg-[#F1F5F9] hover:border-[#94A3B8] rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 min-h-[110px] relative">
+                    <div className="border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC] hover:bg-[#F1F5F9] hover:border-[#94A3B8] rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 min-h-27.5 relative">
                       <svg className="w-7 h-7 text-[#94A3B8]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       <span className="text-[#475569] font-bold text-xs uppercase tracking-wider">
                         {screenshotName ? 'Change Screenshot' : 'Choose Screenshot'}
                       </span>
-                      <span className="text-[10px] text-[#94A3B8] max-w-[200px] truncate">
+                      <span className="text-[10px] text-[#94A3B8] max-w-50 truncate">
                         {screenshotName || 'No file chosen'}
                       </span>
                       <input
@@ -680,7 +680,7 @@ export default function PostJobPage() {
                 <div className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4 text-left space-y-2.5">
                   <div className="flex justify-between text-xs font-semibold text-[#64748B]">
                     <span>Job Title:</span>
-                    <span className="text-[#0F172A] font-bold truncate max-w-[200px]">{title}</span>
+                    <span className="text-[#0F172A] font-bold truncate max-w-50">{title}</span>
                   </div>
                   <div className="flex justify-between text-xs font-semibold text-[#64748B]">
                     <span>Duration:</span>
@@ -735,7 +735,7 @@ export default function PostJobPage() {
             <span className="text-[#475569] font-black text-xs uppercase tracking-wider block mb-2">
               TARGET LOCAL AUDIENCE
             </span>
-            <p className="text-[11px] text-[#64748B] font-semibold leading-relaxed max-w-[180px]">
+            <p className="text-[11px] text-[#64748B] font-semibold leading-relaxed max-w-45">
               Supercharge your agency&apos;s hiring speed. Placement banner rates start from ₹99/week.
             </p>
           </div>
