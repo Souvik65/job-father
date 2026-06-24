@@ -15,13 +15,16 @@ export function AdminSidebar({ portalName = 'JobFather' }: AdminSidebarProps) {
     { name: 'Job Listings',     href: '/admin/jobs',         icon: 'work',       fillIcon: false },
     { name: 'Create Job',       href: '/admin/jobs/create',  icon: 'add_box',    fillIcon: false },
     { name: 'Advertisements',   href: '/admin/ads',          icon: 'campaign',   fillIcon: false },
+    { name: 'Students',         href: '/admin/students',     icon: 'school',     fillIcon: false },
     { name: 'Email Subscribers',href: '/admin/subscribers',  icon: 'mail',       fillIcon: false },
+    { name: 'Mock Test Manager',href: '/admin/mock-test-manager', icon: 'quiz', fillIcon: false },
   ];
 
   const isItemActive = (href: string) => {
     if (href === '/admin') return pathname === '/admin';
     if (href === '/admin/jobs/create') return pathname === '/admin/jobs/create';
     if (href === '/admin/jobs') return pathname.startsWith('/admin/jobs') && pathname !== '/admin/jobs/create';
+    if (href === '/admin/students') return pathname.startsWith('/admin/students');
     return pathname.startsWith(href);
   };
 

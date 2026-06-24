@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { verifyJob, deleteJob } from './actions';
+import { verifyJob } from './actions';
+import { DeleteJobButton } from '@/components/DeleteJobButton';
 import { formatDate } from '@/lib/utils';
 import { PaymentScreenshotViewer } from '@/components/PaymentScreenshotViewer';
 
@@ -8,7 +9,7 @@ export default async function AdminDashboard() {
   // Query actual data from database
   const totalJobsCount = await prisma.job.count();
   const activeJobsCount = await prisma.job.count({ where: { isVerified: true } });
-  const totalUsersCount = await prisma.user.count();
+  const totalSubscribersCount = await prisma.newsletterSubscriber.count();
   const activeAdsCount = await prisma.ad.count({ where: { isActive: true } });
 
   // Get pending jobs
@@ -33,19 +34,6 @@ export default async function AdminDashboard() {
     orderBy: { postedAt: 'desc' },
     include: { timeline: true },
     take: 10,
-  });
-
-  // Get recent registered users (mock-test users) for the "Recent Users" table (limit to 5)
-  const recentSubscribers = await prisma.user.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 5,
-    select: {
-      email: true,
-      name: true,
-      role: true,
-      createdAt: true,
-      _count: { select: { mockTestResults: true } },
-    },
   });
 
   return (
@@ -85,13 +73,13 @@ export default async function AdminDashboard() {
           <div className="text-2xl sm:text-3xl font-bold text-[#1a1c1c]">{activeJobsCount.toLocaleString()}</div>
         </div>
 
-        {/* Metric Card 3: Email Subscribers (Registered Users) */}
+        {/* Metric Card 3: Email Subscribers */}
         <div className="bg-white border border-[#c6c5d4] rounded-xl p-3 sm:p-5 flex flex-col gap-2 shadow-sm min-w-0">
           <div className="flex items-center gap-1.5 sm:gap-2 text-[#454652] min-w-0">
             <span className="material-symbols-outlined text-[#343d96] text-lg sm:text-xl shrink-0">mail</span>
             <span className="text-[9px] sm:text-xs font-semibold uppercase tracking-wider truncate">Subscribers</span>
           </div>
-          <div className="text-2xl sm:text-3xl font-bold text-[#1a1c1c]">{totalUsersCount.toLocaleString()}</div>
+          <div className="text-2xl sm:text-3xl font-bold text-[#1a1c1c]">{totalSubscribersCount.toLocaleString()}</div>
         </div>
 
         {/* Metric Card 4: Active Ads */}
@@ -198,15 +186,7 @@ export default async function AdminDashboard() {
                     <span className="material-symbols-outlined text-sm">edit</span>
                     Edit
                   </Link>
-                  <form action={deleteJob.bind(null, job.id)}>
-                    <button
-                      type="submit"
-                      className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg font-semibold text-xs transition shadow-sm flex items-center gap-1 touch-target cursor-pointer"
-                    >
-                      <span className="material-symbols-outlined text-sm">delete</span>
-                      Delete
-                    </button>
-                  </form>
+                  <DeleteJobButton jobId={job.id} />
                 </div>
               </div>
             ))}
@@ -263,9 +243,9 @@ export default async function AdminDashboard() {
       )}
 
       {/* Tables Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Jobs Table (Left column, spanning 2 grid columns) */}
-        <div className="bg-white border border-[#c6c5d4] rounded-xl overflow-hidden shadow-sm lg:col-span-2 flex flex-col">
+      <div className="grid grid-cols-1 gap-6">
+        {/* Recent Jobs Table */}
+        <div className="bg-white border border-[#c6c5d4] rounded-xl overflow-hidden shadow-sm flex flex-col">
           <div className="p-4 border-b border-[#c6c5d4] bg-[#f3f3f3] flex justify-between items-center">
             <h3 className="font-bold text-base text-[#000666]">Recent Jobs</h3>
             <span className="text-xs text-[#454652] font-medium">{recentJobs.length} active listed</span>
@@ -301,15 +281,7 @@ export default async function AdminDashboard() {
                         >
                           <span className="material-symbols-outlined text-sm block">edit</span>
                         </Link>
-                        <form action={deleteJob.bind(null, job.id)}>
-                          <button
-                            type="submit"
-                            className="bg-rose-50 hover:bg-rose-100 text-rose-600 p-1.5 rounded-lg transition"
-                            title="Delete"
-                          >
-                            <span className="material-symbols-outlined text-sm block">delete</span>
-                          </button>
-                        </form>
+                        <DeleteJobButton jobId={job.id} variant="icon" />
                       </td>
                     </tr>
                   ))
@@ -319,48 +291,7 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Subscribers Table (Right column, spanning 1 grid column) */}
-        <div className="bg-white border border-[#c6c5d4] rounded-xl overflow-hidden shadow-sm flex flex-col">
-          <div className="p-4 border-b border-[#c6c5d4] bg-[#f3f3f3] flex justify-between items-center">
-            <h3 className="font-bold text-base text-[#000666]">Recent Users</h3>
-            <span className="text-xs text-[#454652] font-medium">Top 5</span>
-          </div>
-          <div className="overflow-x-auto flex-1">
-            <table className="w-full text-left border-collapse h-full">
-              <thead className="bg-[#eeeeee] text-[#454652] text-xs font-semibold border-b border-[#c6c5d4]">
-                <tr>
-                  <th className="py-3 px-4 font-semibold">Email</th>
-                  <th className="py-3 px-4 font-semibold">Tests</th>
-                  <th className="py-3 px-4 font-semibold text-right">Joined</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm divide-y divide-[#c6c5d4]">
-                {recentSubscribers.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="py-8 px-4 text-center text-[#454652]">
-                      No registered users yet.
-                    </td>
-                  </tr>
-                ) : (
-                  recentSubscribers.map((subscriber) => (
-                    <tr key={subscriber.email} className="hover:bg-[#f9f9f9] transition-colors">
-                      <td className="py-3 px-4 text-[#1a1c1c] font-medium truncate max-w-[130px]" title={subscriber.email}>
-                        <div className="truncate">{subscriber.email}</div>
-                        {subscriber.name && <div className="text-[#454652] text-xs truncate">{subscriber.name}</div>}
-                      </td>
-                      <td className="py-3 px-4 text-[#454652] text-center font-bold">
-                        {subscriber._count.mockTestResults}
-                      </td>
-                      <td className="py-3 px-4 text-[#454652] text-right text-xs">
-                        {formatDate(subscriber.createdAt)}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+
       </div>
     </div>
   );

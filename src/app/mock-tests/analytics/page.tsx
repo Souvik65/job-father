@@ -13,7 +13,7 @@ export const metadata = {
 };
 
 const SUBJECTS = [
-  { id: 'math',      name: 'Mathematics',      short: 'Math',    icon: '📐', color: '#f97316' },
+  { id: 'math',      name: 'Quantitative Aptitude',      short: 'Math',    icon: '📐', color: '#f97316' },
   { id: 'reasoning', name: 'Reasoning Ability', short: 'Reason',  icon: '🧩', color: '#7c3aed' },
   { id: 'english',   name: 'English Language',  short: 'English', icon: '📖', color: '#16a34a' },
   { id: 'gk',        name: 'General Knowledge', short: 'GK',      icon: '🌍', color: '#1a4fd6' },

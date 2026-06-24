@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { verifyJob, deleteJob } from '../actions';
+import { verifyJob } from '../actions';
+import { DeleteJobButton } from '@/components/DeleteJobButton';
 import { formatDate } from '@/lib/utils';
 import { Category } from '@prisma/client';
 import { CategoryFilter } from '@/components/CategoryFilter';
@@ -296,20 +297,7 @@ export default async function AdminJobListingsPage({
                           </Link>
 
                           {/* Delete */}
-                          <form action={deleteJob.bind(null, job.id)}>
-                            <button
-                              type="submit"
-                              className="p-1.5 rounded-lg text-[#454652] hover:text-[#ba1a1a] hover:bg-[#ffdad6] transition"
-                              title="Delete job"
-                            >
-                              <span
-                                className="material-symbols-outlined block"
-                                style={{ fontSize: 18 }}
-                              >
-                                delete
-                              </span>
-                            </button>
-                          </form>
+                          <DeleteJobButton jobId={job.id} variant="icon" />
 
                           {/* Publish / Unpublish Toggle */}
                           <form action={verifyJob.bind(null, job.id, !job.isVerified)}>

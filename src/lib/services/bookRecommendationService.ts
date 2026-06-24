@@ -27,7 +27,7 @@ const DEFAULT_BOOKS: PrepBook[] = [
 ];
 
 const SUBJECTS_MAP: Record<string, string> = {
-  math: 'Mathematics',
+  math: 'Quantitative Aptitude',
   reasoning: 'Reasoning Ability',
   english: 'English Language',
   gk: 'General Knowledge',

@@ -11,7 +11,6 @@ export default async function AdminSettingsPage() {
       initialPopupDelay={Number(settings.popupDelay ?? 5)} // Default to 5 seconds if not set
       initialFabEnabled={settings.fabEnabled ? settings.fabEnabled === 'true' : false}
       initialBooksJson={settings.recommended_books ?? '[]'}
-      initialQBJson={settings.mock_test_qb ?? 'null'}
     />
   );
 }

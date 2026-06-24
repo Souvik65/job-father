@@ -22,11 +22,11 @@ type UpgradeRequest = {
 function isSafeImageUrl(url: string | null): boolean {
   if (!url) return false;
   try {
-    if (url.startsWith("/") || url.startsWith("./") || url.startsWith("../")) {
+    if (url.startsWith("/") || url.startsWith("./") || url.startsWith("../") || url.startsWith("blob:")) {
       return true;
     }
     const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
+    return parsed.protocol === "http:" || parsed.protocol === "https:" || parsed.protocol === "blob:";
   } catch {
     return false;
   }
@@ -56,7 +56,29 @@ export default function UpgradeRequestsPage() {
         }
         const data = await res.json();
         if (data.requests) {
-          setRequests(data.requests);
+          // Convert base64 data URIs to blob URLs to avoid browser length limits
+          const processedRequests = data.requests.map((req: UpgradeRequest) => {
+            if (req.screenshotUrl && req.screenshotUrl.startsWith('data:')) {
+              try {
+                const arr = req.screenshotUrl.split(',');
+                const mimeMatch = arr[0].match(/:(.*?);/);
+                const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                  u8arr[n] = bstr.charCodeAt(n);
+                }
+                const blob = new Blob([u8arr], { type: mime });
+                return { ...req, screenshotUrl: URL.createObjectURL(blob) };
+              } catch (e) {
+                console.error('Failed to create blob from base64', e);
+                return req;
+              }
+            }
+            return req;
+          });
+          setRequests(processedRequests);
         } else {
           setRequests([]);
         }
@@ -165,7 +187,7 @@ export default function UpgradeRequestsPage() {
                   </p>
                   
                   <div className="w-[100px] h-[150px] bg-slate-100 border border-slate-200 rounded-md overflow-hidden mb-4 shadow-sm relative flex items-center justify-center">
-                    {failedImages[req.id] ? (
+                    {failedImages[req.id] || !isSafeImageUrl(req.screenshotUrl) ? (
                       <div className="text-center p-2 flex flex-col items-center justify-center gap-1">
                         <ReceiptText className="w-6 h-6 text-slate-400" />
                         <span className="text-[9px] text-slate-400 font-bold leading-tight">No Preview</span>
@@ -173,7 +195,7 @@ export default function UpgradeRequestsPage() {
                     ) : (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
-                        src={isSafeImageUrl(req.screenshotUrl) ? req.screenshotUrl : ""}
+                        src={req.screenshotUrl}
                         alt="Payment Screenshot"
                         className="absolute inset-0 w-full h-full object-cover"
                         onError={() => {
@@ -246,7 +268,7 @@ export default function UpgradeRequestsPage() {
             >
               <X className="w-6 h-6" />
             </button>
-            {modalImageFailed ? (
+            {modalImageFailed || !isSafeImageUrl(selectedImage) ? (
               <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-8 max-w-md w-full text-center flex flex-col items-center justify-center gap-3 relative z-20">
                 <ReceiptText className="w-12 h-12 text-slate-500" />
                 <p className="text-sm font-semibold text-slate-300">Unable to load payment screenshot preview.</p>
@@ -254,7 +276,7 @@ export default function UpgradeRequestsPage() {
             ) : (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src={isSafeImageUrl(selectedImage) ? selectedImage : ""}
+                src={selectedImage}
                 alt="Payment Screenshot Preview"
                 className="max-w-full max-h-full object-contain rounded-xl"
                 onError={() => setModalImageFailed(true)}

@@ -1,17 +1,12 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { deleteUserSubscriber, bulkDeleteUserSubscribers } from './actions';
+import { deleteSubscriber, bulkDeleteSubscribers } from './actions';
 import { Toast } from '@/components/Toast';
 
 type Subscriber = {
   id: string;
-  name: string | null;
   email: string;
-  role: string;
-  testsCount: number;
-  bestPct: number | null;
-  lastActive: string | null;
   createdAt: string | Date;
 };
 
@@ -36,8 +31,7 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
   });
 
   const filtered = subscribers.filter(sub =>
-    sub.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (sub.name ?? '').toLowerCase().includes(searchTerm.toLowerCase())
+    sub.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -66,14 +60,14 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
   const handleDelete = (id: string) => {
     setConfirmDialog({
       isOpen: true,
-      message: 'Are you sure you want to delete this user account?',
+      message: 'Are you sure you want to delete this subscriber?',
       action: () => {
         startTransition(async () => {
-          const result = await deleteUserSubscriber(id);
+          const result = await deleteSubscriber(id);
           if (result.error) { showNotification(result.error); return; }
           setSubscribers(prev => prev.filter(s => s.id !== id));
           setSelectedIds(prev => { const next = new Set(prev); next.delete(id); return next; });
-          showNotification('User deleted successfully.');
+          showNotification('Subscriber deleted successfully.');
         });
       },
     });
@@ -84,14 +78,14 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
     const count = selectedIds.size;
     setConfirmDialog({
       isOpen: true,
-      message: `Are you sure you want to delete ${count} user account${count > 1 ? 's' : ''}?`,
+      message: `Are you sure you want to delete ${count} subscriber${count > 1 ? 's' : ''}?`,
       action: () => {
         startTransition(async () => {
-          const result = await bulkDeleteUserSubscribers(Array.from(selectedIds));
+          const result = await bulkDeleteSubscribers(Array.from(selectedIds));
           if (result.error) { showNotification(result.error); return; }
           setSubscribers(prev => prev.filter(s => !selectedIds.has(s.id)));
           setSelectedIds(new Set());
-          showNotification(`${count} user(s) deleted successfully.`);
+          showNotification(`${count} subscriber(s) deleted successfully.`);
         });
       },
     });
@@ -100,14 +94,9 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
   const handleExportCSV = () => {
     if (filtered.length === 0) return;
     const escape = (f: string) => (f.includes(',') || f.includes('"') || f.includes('\n')) ? `"${f.replace(/"/g, '""')}"` : f;
-    const headers = ['Name', 'Email Address', 'Role', 'Tests Taken', 'Best Score %', 'Last Active', 'Joined At'];
+    const headers = ['Email Address', 'Subscribed At'];
     const rows = filtered.map(s => [
-      escape(s.name ?? ''),
       escape(s.email),
-      escape(s.role),
-      escape(String(s.testsCount)),
-      escape(s.bestPct !== null ? `${s.bestPct}%` : '—'),
-      escape(s.lastActive ?? '—'),
       escape(new Date(s.createdAt).toISOString()),
     ]);
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -125,8 +114,8 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#000666] mb-1">Registered Users</h1>
-        <p className="text-sm text-[#454652]">All mock test users — view activity, scores, and manage accounts.</p>
+        <h1 className="text-3xl font-bold text-[#000666] mb-1">Email Subscribers</h1>
+        <p className="text-sm text-[#454652]">Users who subscribed to the newsletter via the popup.</p>
       </div>
 
       {/* Toolbar */}
@@ -136,7 +125,7 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#454652] text-[20px]">search</span>
             <input
               className="w-full pl-10 pr-4 py-2 border border-[#c6c5d4] rounded-lg bg-[#f9f9f9] focus:outline-none focus:border-[#000666] focus:ring-1 focus:ring-[#000666] text-sm text-[#1a1c1c] transition-shadow"
-              placeholder="Search by name or email..."
+              placeholder="Search by email..."
               type="text"
               value={searchTerm}
               onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); setSelectedIds(new Set()); }}
@@ -177,13 +166,8 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
                     className="w-4 h-4 rounded border-[#c6c5d4] text-[#000666] focus:ring-[#000666] cursor-pointer"
                   />
                 </th>
-                <th className="p-4 text-xs font-semibold text-[#454652] uppercase tracking-wider">Name</th>
                 <th className="p-4 text-xs font-semibold text-[#454652] uppercase tracking-wider">Email</th>
-                <th className="p-4 text-xs font-semibold text-[#454652] uppercase tracking-wider">Role</th>
-                <th className="p-4 text-xs font-semibold text-[#454652] uppercase tracking-wider text-center">Tests Taken</th>
-                <th className="p-4 text-xs font-semibold text-[#454652] uppercase tracking-wider text-center">Best Score</th>
-                <th className="p-4 text-xs font-semibold text-[#454652] uppercase tracking-wider">Last Active</th>
-                <th className="p-4 text-xs font-semibold text-[#454652] uppercase tracking-wider">Joined</th>
+                <th className="p-4 text-xs font-semibold text-[#454652] uppercase tracking-wider">Subscribed Date</th>
                 <th className="p-4 text-xs font-semibold text-[#454652] uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
@@ -203,32 +187,7 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
                         className="w-4 h-4 rounded border-[#c6c5d4] text-[#000666] focus:ring-[#000666] cursor-pointer"
                       />
                     </td>
-                    <td className="p-4 text-sm text-[#1a1c1c] font-semibold">
-                      {sub.name ?? <span className="text-[#999]">—</span>}
-                    </td>
                     <td className="p-4 text-sm text-[#1a1c1c] font-medium">{sub.email}</td>
-                    <td className="p-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ${sub.role === 'ADMIN' ? 'bg-[#e8e8ff] text-[#000666]' : 'bg-[#a3f69c] text-[#002204]'}`}>
-                        {sub.role}
-                      </span>
-                    </td>
-                    <td className="p-4 text-center">
-                      <span className={`text-sm font-bold ${sub.testsCount > 0 ? 'text-[#000666]' : 'text-[#999]'}`}>
-                        {sub.testsCount > 0 ? sub.testsCount : '—'}
-                      </span>
-                    </td>
-                    <td className="p-4 text-center">
-                      {sub.bestPct !== null ? (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${sub.bestPct >= 80 ? 'bg-green-100 text-green-700' : sub.bestPct >= 60 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
-                          {sub.bestPct}%
-                        </span>
-                      ) : (
-                        <span className="text-[#999] text-sm">—</span>
-                      )}
-                    </td>
-                    <td className="p-4 text-sm text-[#454652]">
-                      {sub.lastActive ?? <span className="text-[#999]">Never</span>}
-                    </td>
                     <td className="p-4 text-sm text-[#454652]">
                       {new Date(sub.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
@@ -237,7 +196,7 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
                         onClick={() => handleDelete(sub.id)}
                         disabled={isPending}
                         className="text-[#454652] hover:text-[#ba1a1a] transition-colors p-1.5 rounded-full hover:bg-[#ffdad6]/50 disabled:opacity-50"
-                        title="Delete User"
+                        title="Delete Subscriber"
                       >
                         <span className="material-symbols-outlined text-[20px]">delete</span>
                       </button>
@@ -255,7 +214,7 @@ export default function SubscribersClient({ initialSubscribers }: Props) {
             <p className="text-sm text-[#454652]">
               Showing <span className="font-semibold text-[#1a1c1c]">{filtered.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}</span> to{' '}
               <span className="font-semibold text-[#1a1c1c]">{Math.min(currentPage * itemsPerPage, filtered.length)}</span> of{' '}
-              <span className="font-semibold text-[#1a1c1c]">{filtered.length}</span> users
+              <span className="font-semibold text-[#1a1c1c]">{filtered.length}</span> subscribers
             </p>
           </div>
           <div className="flex-1 flex justify-between sm:justify-end gap-2">

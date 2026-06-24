@@ -1,8 +1,18 @@
 'use client';
 
+import Link from 'next/link';
+
 interface FooterProps {
   portalName?: string;
 }
+
+const footerLinks = [
+  { label: 'About Us', href: '/about' },
+  { label: 'Contact Us', href: '/contact' },
+  { label: 'Privacy Policy', href: '/privacy-policy' },
+  { label: 'Terms & Conditions', href: '/terms' },
+  { label: 'Disclaimer', href: '/disclaimer' },
+];
 
 export function Footer({ portalName = 'JOBFATHER' }: FooterProps) {
   const currentYear = new Date().getFullYear();
@@ -13,9 +23,22 @@ export function Footer({ portalName = 'JOBFATHER' }: FooterProps) {
         <p className="font-black tracking-widest uppercase text-white/40 text-[10px]">
           NOT AFFILIATED WITH ANY GOVT.
         </p>
-        <p className="font-bold tracking-wider uppercase text-white/60 text-[9px]">
-          © {currentYear} {portalName}
-        </p>
+        <nav aria-label="Footer" className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+          {footerLinks.map((link) => (
+            <span key={link.href} className="flex items-center">
+              <Link
+                href={link.href}
+                className="text-white/50 hover:text-white/90 transition-colors text-[10px] font-semibold tracking-wide"
+              >
+                {link.label}
+              </Link>
+              <span className="text-white/20 ml-3">•</span>
+            </span>
+          ))}
+          <span className="font-bold tracking-wider uppercase text-white/60 text-[9px]">
+            © {currentYear} {portalName}
+          </span>
+        </nav>
       </div>
     </footer>
   );

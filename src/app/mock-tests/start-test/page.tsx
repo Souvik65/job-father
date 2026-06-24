@@ -1,5 +1,6 @@
 'use client';
 
+// Force recompile to clear Turbopack empty file cache
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -40,75 +41,14 @@ type Subject = {
 };
 
 const SUBJECTS: Subject[] = [
-  { id: 'math', name: 'Mathematics', short: 'Math', icon: '📐', color: '#f97316' },
+  { id: 'math', name: 'Quantitative Aptitude', short: 'Math', icon: '📐', color: '#f97316' },
   { id: 'reasoning', name: 'Reasoning Ability', short: 'Reason', icon: '🧩', color: '#7c3aed' },
   { id: 'english', name: 'English Language', short: 'English', icon: '📖', color: '#16a34a' },
   { id: 'gk', name: 'General Knowledge', short: 'GK', icon: '🌍', color: '#1a4fd6' },
   { id: 'pyq', name: 'Previous Year Qs', short: 'PYQ', icon: '📋', color: '#dc2626' }
 ];
 
-const QB: Record<string, Question[]> = {
-  math: [
-    { q: "A train travels 360 km in 4 hours. What is its speed?", opts: ["80 km/h", "90 km/h", "100 km/h", "70 km/h"], ans: 1, exp: "Speed = Distance / Time = 360 / 4 = 90 km/h", diff: "easy" },
-    { q: "If 15% of a number is 45, what is the number?", opts: ["300", "250", "350", "280"], ans: 0, exp: "Number = 45 × 100 / 15 = 300", diff: "easy" },
-    { q: "Simple Interest on Rs 5000 at 8% p.a. for 3 years?", opts: ["Rs 1000", "Rs 1200", "Rs 1400", "Rs 1600"], ans: 1, exp: "SI = P × R × T / 100 = 5000 × 8 × 3 / 100 = Rs 1200", diff: "easy" },
-    { q: "Bought at Rs 800, sold at Rs 1000. Profit percentage?", opts: ["20%", "25%", "15%", "30%"], ans: 1, exp: "Profit% = (200/800) × 100 = 25%", diff: "easy" },
-    { q: "LCM of 12, 16, and 24?", opts: ["48", "96", "36", "72"], ans: 0, exp: "LCM(12,16,24) = 48", diff: "easy" },
-    { q: "A pipe fills a tank in 6 hours, another empties in 8 hours. Together how long to fill the tank?", opts: ["24 hrs", "20 hrs", "18 hrs", "22 hrs"], ans: 0, exp: "Net rate = 1/6 - 1/8 = 1/24. Tank fills in 24 hrs.", diff: "medium" },
-    { q: "Two numbers are in ratio 3:4. Their HCF is 8. Find their LCM.", opts: ["96", "64", "84", "108"], ans: 0, exp: "Numbers are 24 & 32. LCM = 96.", diff: "medium" },
-    { q: "A sum doubles in 5 years at simple interest. Rate% p.a.?", opts: ["20%", "15%", "25%", "10%"], ans: 0, exp: "SI = P means R = 100/T = 100/5 = 20%", diff: "medium" },
-    { q: "If (x+1/x)=5, find (x²+1/x²).", opts: ["23", "27", "25", "21"], ans: 0, exp: "(x+1/x)² = x²+2+1/x² = 25, so x²+1/x² = 23", diff: "hard" },
-    { q: "A boat goes 30 km upstream in 3 hrs and downstream in 1.5 hrs. Speed of stream?", opts: ["5 km/h", "4 km/h", "6 km/h", "3 km/h"], ans: 0, exp: "US=10, DS=20. Stream = (20-10)/2 = 5 km/h", diff: "hard" }
-  ],
-  reasoning: [
-    { q: "APPLE coded as BQQMF. How is MANGO coded?", opts: ["NBOQH", "NBOHP", "NBPOH", "OBOQH"], ans: 1, exp: "Each letter shifts +1. M→N, A→B, N→O, G→H, O→P = NBOHP", diff: "easy" },
-    { q: "Odd one out: 2, 3, 5, 7, 9, 11", opts: ["9", "11", "5", "7"], ans: 0, exp: "9=3×3 is composite. All others are prime.", diff: "easy" },
-    { q: "Series: 1, 4, 9, 16, 25, ?", opts: ["36", "30", "49", "32"], ans: 0, exp: "Perfect squares: 1,4,9,16,25,36", diff: "easy" },
-    { q: "Priya is 8th from left, 12th from right. Total students?", opts: ["19", "20", "18", "21"], ans: 0, exp: "Total = 8 + 12 - 1 = 19", diff: "easy" },
-    { q: "Doctor:Hospital :: Teacher:?", opts: ["School", "Books", "Chalk", "Students"], ans: 0, exp: "A doctor works in a hospital; a teacher works in a school.", diff: "easy" },
-    { q: "If A+B means A is mother of B; A-B means A is brother of B; A×B means A is father of B. In P+Q-R, what is P to R?", opts: ["Mother", "Aunt", "Sister", "Grandmother"], ans: 1, exp: "P is mother of Q, Q is brother of R, so P is Aunt of R.", diff: "medium" },
-    { q: "Point A is 10m East of B. C is 6m South of A. D is 4m West of C. Distance B to D?", opts: ["10m", "8m", "6m", "12m"], ans: 1, exp: "D is at 6m East & 6m South of B. Hypotenuse = √(36+36) = 6√2 ≈ 8.49 ≈ 8m", diff: "medium" },
-    { q: "If all roses are flowers and some flowers are red, which is definitely true?", opts: ["Some roses are red", "All flowers are roses", "Some roses are flowers", "None of the above"], ans: 2, exp: "All roses are flowers is given, so some roses are definitely flowers.", diff: "medium" },
-    { q: "Series: 2, 6, 12, 20, 30, ?", opts: ["42", "44", "40", "46"], ans: 0, exp: "Differences are 4,6,8,10,12. Next = 30+12 = 42", diff: "hard" },
-    { q: "Water image of 3:25 on a clock?", opts: ["8:35", "9:35", "8:45", "9:25"], ans: 0, exp: "Water image of clock = 6:30 → time = 12:00 - 3:25 + 12:00 = (12:00 - given). 12:00 - 3:25 = 8:35", diff: "hard" }
-  ],
-  english: [
-    { q: "Correct spelling?", opts: ["Accomodation", "Accommodation", "Acommodation", "Acomodation"], ans: 1, exp: "Accommodation: double 'c' and double 'm'", diff: "easy" },
-    { q: "She ___ to the market yesterday.", opts: ["go", "goes", "went", "going"], ans: 2, exp: "'Yesterday' = past tense. Past form of 'go' is 'went'", diff: "easy" },
-    { q: "Antonym of ABUNDANT:", opts: ["Scarce", "Plenty", "Ample", "Bountiful"], ans: 0, exp: "Abundant = plentiful. Antonym = Scarce", diff: "easy" },
-    { q: "'Laconic' means?", opts: ["Brief and to the point", "Long-winded", "Unclear", "Dramatic"], ans: 0, exp: "Laconic = using very few words; brief and concise", diff: "easy" },
-    { q: "'___ umbrella is kept there.' — Correct article?", opts: ["A", "An", "The", "No article"], ans: 1, exp: "'Umbrella' starts with a vowel sound. Use 'An'", diff: "easy" },
-    { q: "Choose the correct sentence:", opts: ["Neither he nor I are wrong", "Neither he nor I am wrong", "Neither he nor I is wrong", "Neither he nor I were wrong"], ans: 1, exp: "With neither...nor, the verb agrees with the nearest subject (I), so 'am'", diff: "medium" },
-    { q: "Synonym of AMELIORATE:", opts: ["Worsen", "Improve", "Ignore", "Complicate"], ans: 1, exp: "Ameliorate means to make something better = Improve", diff: "medium" },
-    { q: "The passive voice of 'She was writing a letter':", opts: ["A letter was being written by her", "A letter was written by her", "A letter is written by her", "A letter had been written by her"], ans: 0, exp: "Past continuous passive = was/were being + V3. 'A letter was being written by her'", diff: "medium" },
-    { q: "Identify the figure of speech: 'The pen is mightier than the sword'", opts: ["Simile", "Metaphor", "Hyperbole", "Personification"], ans: 1, exp: "A metaphor makes a direct comparison without 'like' or 'as'", diff: "hard" },
-    { q: "One word for 'a person who hates mankind':", opts: ["Misanthrope", "Philanthropist", "Egoist", "Pessimist"], ans: 0, exp: "Misanthrope = a person who dislikes humankind", diff: "hard" }
-  ],
-  gk: [
-    { q: "Who is the current President of India?", opts: ["Droupadi Murmu", "Ram Nath Kovind", "Pratibha Patil", "APJ Abdul Kalam"], ans: 0, exp: "Droupadi Murmu became the 15th President on July 25, 2022", diff: "easy" },
-    { q: "Largest state of India by area?", opts: ["Rajasthan", "Madhya Pradesh", "Maharashtra", "Uttar Pradesh"], ans: 0, exp: "Rajasthan is largest at 342,239 sq km", diff: "easy" },
-    { q: "Who wrote India's national anthem?", opts: ["Rabindranath Tagore", "Bankim Chandra", "Subramanya Bharati", "Sarojini Naidu"], ans: 0, exp: "Jana Gana Mana was composed by Rabindranath Tagore", diff: "easy" },
-    { q: "Planet closest to the Sun?", opts: ["Mercury", "Venus", "Earth", "Mars"], ans: 0, exp: "Mercury is closest to the Sun at ~57.9 million km", diff: "easy" },
-    { q: "ISRO headquarters is located in?", opts: ["Bengaluru", "Chennai", "Ahmedabad", "Hyderabad"], ans: 0, exp: "ISRO headquarters is in Bengaluru, Karnataka", diff: "easy" },
-    { q: "Which Constitutional article gives Right to Education?", opts: ["Article 21A", "Article 19", "Article 21", "Article 32"], ans: 0, exp: "Article 21A, added by 86th Amendment in 2002, gives free education to children 6-14 years", diff: "medium" },
-    { q: "'Operation Flood' is associated with?", opts: ["Milk production", "Flood control", "Irrigation", "Wheat production"], ans: 0, exp: "Operation Flood (1970) was a programme to create a national milk grid", diff: "medium" },
-    { q: "Which planet has the most moons in our solar system?", opts: ["Saturn", "Jupiter", "Uranus", "Neptune"], ans: 0, exp: "Saturn has 146 confirmed moons, the most in the solar system", diff: "medium" },
-    { q: "Palk Strait separates India from?", opts: ["Sri Lanka", "Maldives", "Indonesia", "Bangladesh"], ans: 0, exp: "Palk Strait separates India (Tamil Nadu) from Sri Lanka", diff: "hard" },
-    { q: "The 'Doctrine of Lapse' was introduced by?", opts: ["Lord Dalhousie", "Lord Canning", "Lord Wellesley", "Lord Hastings"], ans: 0, exp: "Doctrine of Lapse was introduced by Governor General Lord Dalhousie in 1848", diff: "hard" }
-  ],
-  pyq: [
-    { q: "SSC CGL 2023: If x+y=10 and xy=21, find x-y.", opts: ["2", "4", "3", "5"], ans: 1, exp: "(x-y)²=(x+y)²-4xy=100-84=16. x-y=4", diff: "medium" },
-    { q: "IBPS PO 2022: 'Ephemeral' means?", opts: ["Long lasting", "Short-lived", "Very strong", "Extremely weak"], ans: 1, exp: "Ephemeral = lasting very short time; short-lived", diff: "medium" },
-    { q: "RRB 2023: Which article abolished untouchability?", opts: ["Article 17", "Article 14", "Article 21", "Article 19"], ans: 0, exp: "Article 17 of Indian Constitution abolishes untouchability", diff: "easy" },
-    { q: "CDS 2022: Binary of decimal 12?", opts: ["1100", "1010", "1001", "1110"], ans: 0, exp: "12 = 8+4 = 1100 in binary", diff: "easy" },
-    { q: "NDA 2023: Speed of light in vacuum?", opts: ["3×10⁸ m/s", "3×10⁶ m/s", "3×10¹⁰ m/s", "3×10⁴ m/s"], ans: 0, exp: "Speed of light = 3 × 10⁸ metres per second", diff: "easy" },
-    { q: "SSC CHSL 2023: A cistern is 2/3 full. Pipe A fills in 6 min, B drains in 10 min. How long to empty?", opts: ["15 min", "12 min", "18 min", "20 min"], ans: 0, exp: "Net drain via B only: 2/3 × 10 = 15 min.", diff: "hard" },
-    { q: "IBPS Clerk 2022: Ratio of present ages of A:B = 4:5. After 5 years ratio = 5:6. Find A's current age.", opts: ["20", "25", "15", "30"], ans: 0, exp: "4x+5/5x+5=5/6 → 24x+30=25x+25 → x=5. A=20", diff: "medium" },
-    { q: "SSC GD 2023: Deepest lake in the world?", opts: ["Baikal", "Caspian Sea", "Titicaca", "Superior"], ans: 0, exp: "Lake Baikal in Siberia, Russia is the world's deepest lake at 1,642 m", diff: "easy" },
-    { q: "RRB NTPC 2022: Which gas is used in fire extinguishers?", opts: ["CO₂", "O₂", "N₂", "SO₂"], ans: 0, exp: "Carbon dioxide (CO₂) is used in fire extinguishers to smother fire", diff: "easy" },
-    { q: "CDS 2023: Transformer works on principle of?", opts: ["Mutual induction", "Self induction", "Resonance", "Piezoelectric"], ans: 0, exp: "Transformers work on Faraday's principle of mutual electromagnetic induction", diff: "medium" }
-  ]
-};
+
 
 export default function StartTestPage() {
   const { data: session } = useSession();
@@ -127,6 +67,52 @@ export default function StartTestPage() {
   const [dbState, setDbState] = useState<DbState>({});
   const [userPlan, setUserPlan] = useState<'free' | 'premium'>('free');
 
+  // Seen question fingerprints per subject — loaded from DB on mount
+  // { [subject]: Set<fingerprint> }
+  const [seenMap, setSeenMap] = useState<Record<string, Set<string>>>({});
+
+  // Lightweight fingerprint: first 80 chars of question text, lowercased + collapsed whitespace
+  const fp = useCallback((qText: string) =>
+    qText.slice(0, 80).toLowerCase().replace(/\s+/g, ' ').trim()
+  , []);
+
+  // Dynamic date state that auto-updates at midnight
+  const getTodayDateString = useCallback(() => {
+    const p2 = (n: number) => String(n).padStart(2, '0');
+    const now = new Date();
+    return `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())}`;
+  }, []);
+
+  const [today, setToday] = useState<string>(getTodayDateString());
+
+  // Auto-refresh today's date string at exactly 12:00 AM (midnight) local time
+  useEffect(() => {
+    let timerId: NodeJS.Timeout;
+
+    const scheduleMidnightUpdate = () => {
+      const now = new Date();
+      const tomorrowMidnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1, // Next day
+        0, 0, 0, 0         // 12:00:00.000 AM
+      );
+      const msUntilMidnight = tomorrowMidnight.getTime() - now.getTime();
+
+      timerId = setTimeout(() => {
+        setToday(getTodayDateString());
+        // Re-schedule for the next midnight
+        scheduleMidnightUpdate();
+      }, msUntilMidnight);
+    };
+
+    scheduleMidnightUpdate();
+
+    return () => {
+      if (timerId) clearTimeout(timerId);
+    };
+  }, [getTodayDateString]);
+
   useEffect(() => {
     fetch('/api/questions')
       .then(res => res.json())
@@ -140,8 +126,6 @@ export default function StartTestPage() {
 
   useEffect(() => {
     if (session?.user?.id) {
-      const p2 = (n: number) => String(n).padStart(2, '0');
-      const today = `${new Date().getFullYear()}-${p2(new Date().getMonth() + 1)}-${p2(new Date().getDate())}`;
       fetch(`/api/user/mock-test-stats?clientDate=${today}`)
         .then(res => res.json())
         .then(data => {
@@ -152,7 +136,28 @@ export default function StartTestPage() {
         })
         .catch(console.error);
     }
+  }, [session, today]);
+
+  // Load seen question fingerprints for all subjects from DB
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    const subjects = ['math', 'reasoning', 'english', 'gk', 'pyq'];
+    Promise.all(
+      subjects.map(s =>
+        fetch(`/api/user/question-history?subject=${s}`)
+          .then(r => r.json())
+          .then(d => ({ subject: s, hashes: (d.seenHashes as string[]) || [] }))
+          .catch(() => ({ subject: s, hashes: [] as string[] }))
+      )
+    ).then(results => {
+      const map: Record<string, Set<string>> = {};
+      results.forEach(({ subject, hashes }) => {
+        map[subject] = new Set(hashes);
+      });
+      setSeenMap(map);
+    });
   }, [session]);
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Engine overlay state
@@ -231,6 +236,38 @@ export default function StartTestPage() {
               window.dispatchEvent(new Event("stats-updated"));
             })
             .catch(err => console.error('[mock-test] Failed to sync result to DB:', err));
+
+            // --- Save seen question fingerprints to prevent repeats next test ---
+            const newHashes = prevQs.map(q =>
+              q.q.slice(0, 80).toLowerCase().replace(/\s+/g, ' ').trim()
+            );
+            const totalPoolSize =
+              (customQB && customQB[prevSubj.id]?.length) || 0;
+
+            fetch('/api/user/question-history', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                subject: prevSubj.id,
+                newHashes,
+                totalPoolSize,
+              }),
+            })
+            .then(r => r.json())
+            .then(data => {
+              if (data.reset) {
+                // Server reset the history — clear local seen map too
+                setSeenMap(prev => ({ ...prev, [prevSubj.id]: new Set<string>() }));
+              } else {
+                // Update local seen map with the new hashes
+                setSeenMap(prev => {
+                  const updated = new Set(prev[prevSubj.id] ?? []);
+                  newHashes.forEach(h => updated.add(h));
+                  return { ...prev, [prevSubj.id]: updated };
+                });
+              }
+            })
+            .catch(err => console.error('[mock-test] Failed to save question history:', err));
           }
 
           return prevSubj;
@@ -243,42 +280,81 @@ export default function StartTestPage() {
 
     setTestActive(false);
     setResultsActive(true);
-  }, [testStartTime, session, testMode, userPlan]);
+  }, [testStartTime, session, testMode, userPlan, customQB]);
 
   // Declare startTest with useCallback BEFORE the effect that references it
   const startTest = useCallback((subj: Subject) => {
     const isPrem = userPlan !== 'free';
-    const maxQ = isPrem ? 10 : 3;
-    let pool = (customQB && customQB[subj.id]) || QB[subj.id] || [];
-    if (testDiff !== 'all') {
-      pool = pool.filter(q => q.diff === testDiff);
+    const maxQ = isPrem ? 50 : 10;
+
+    // Check if user has already reached daily limit for this subject
+    const p2 = (n: number) => String(n).padStart(2, '0');
+    const today = `${new Date().getFullYear()}-${p2(new Date().getMonth() + 1)}-${p2(new Date().getDate())}`;
+    const subjectRecord = dbState[today]?.[subj.id];
+    if (subjectRecord && subjectRecord.max >= maxQ) {
+      showToast(`Daily limit reached for ${subj.name} — come back tomorrow!`);
+      return;
     }
+
+    // Use sheets questions — dedup by question text
+    const sheetsPool: Question[] = (customQB && customQB[subj.id]) || [];
+
+    const deduped = new Set<string>();
+    const merged: Question[] = [];
+    for (const q of sheetsPool) {
+      if (!deduped.has(q.q)) {
+        deduped.add(q.q);
+        merged.push(q);
+      }
+    }
+
+    const pool = testDiff !== 'all' ? merged.filter(q => q.diff === testDiff) : merged;
+
     if (!pool.length) {
       showToast(`No ${testDiff} questions available for this subject`);
       return;
     }
 
-    const shuffled = [...pool]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, Math.min(maxQ, pool.length));
+    // ── Filter out already-seen questions ────────────────────────────────────
+    // Each question's "fingerprint" is the first 80 chars of its text (lowercased).
+    // seenMap is loaded from the DB on mount; if a fingerprint matches, skip it.
+    const subjectSeen = seenMap[subj.id] ?? new Set<string>();
+    const unseen = pool.filter(q => !subjectSeen.has(fp(q.q)));
+
+    // If fewer unseen questions than maxQ, recycle pool (use all questions again)
+    // This prevents the test from running dry when the user has seen most questions.
+    const finalPool = unseen.length >= maxQ ? unseen : pool;
+
+    if (unseen.length < maxQ && unseen.length < pool.length) {
+      // Soft-reset: clear the local seen map for this subject so next test is fresh
+      setSeenMap(prev => ({ ...prev, [subj.id]: new Set<string>() }));
+    }
+
+    // Fisher-Yates shuffle for true randomization
+    const shuffled = [...finalPool];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    const selected = shuffled.slice(0, Math.min(maxQ, shuffled.length));
 
     setCurrentSubj(subj);
-    setCurrentQuestions(shuffled);
+    setCurrentQuestions(selected);
     setCurrentQuestionIndex(0);
-    setSelectedAnswers(new Array(shuffled.length).fill(null));
-    setBookmarkedQuestions(new Array(shuffled.length).fill(false));
+    setSelectedAnswers(new Array(selected.length).fill(null));
+    setBookmarkedQuestions(new Array(selected.length).fill(false));
     setTestStartTime(Date.now());
     setResultsActive(false);
 
     if (testMode === 'practice') {
       setOverallTimeLeft(600);
     } else {
-      const initTime = shuffled.length * 45;
+      const initTime = selected.length * 45;
       setOverallTimeLeft(initTime);
       setQuestionTimeLeft(35);
     }
     setTestActive(true);
-  }, [userPlan, testDiff, testMode, customQB, showToast]);
+  }, [userPlan, testDiff, testMode, customQB, showToast, dbState, seenMap, fp]);
 
   // Handle direct start from URL — runs after startTest is declared
   useEffect(() => {
@@ -364,8 +440,7 @@ export default function StartTestPage() {
     showToast(updated[currentQuestionIndex] ? 'Question bookmarked!' : 'Bookmark removed');
   };
 
-  const p2 = (n: number) => String(n).padStart(2, '0');
-  const today = `${new Date().getFullYear()}-${p2(new Date().getMonth() + 1)}-${p2(new Date().getDate())}`;
+
 
   return (
     <>
@@ -387,7 +462,7 @@ export default function StartTestPage() {
                   if (qTimerRef.current) clearInterval(qTimerRef.current);
                   setTestActive(false);
                 }}
-                className="text-xs font-black text-white/60 tracking-wider uppercase bg-white/5 border border-white/10 px-4 py-2.5 rounded-full hover:bg-white/10 hover:text-white flex items-center gap-1.5 transition-colors shrink-0 min-h-[44px]"
+                className="text-xs font-black text-white/60 tracking-wider uppercase bg-white/5 border border-white/10 px-4 py-2.5 rounded-full hover:bg-white/10 hover:text-white flex items-center gap-1.5 transition-colors shrink-0 min-h-11"
               >
                 ← Exit
               </button>
@@ -397,7 +472,7 @@ export default function StartTestPage() {
                 </span>
                 <span className="text-[8px] font-bold text-white/30 tracking-widest uppercase mt-1">Mock Test</span>
               </div>
-              <div className={`rounded-xl px-4 py-2.5 text-xs font-black tracking-wider flex items-center gap-1.5 shrink-0 min-h-[44px] ${
+              <div className={`rounded-xl px-4 py-2.5 text-xs font-black tracking-wider flex items-center gap-1.5 shrink-0 min-h-11 ${
                 testMode === 'practice'
                   ? 'bg-emerald-500/15 border border-emerald-500/25 text-emerald-400'
                   : overallTimeLeft < 30
@@ -602,7 +677,7 @@ export default function StartTestPage() {
               <button
                 onClick={() => currentQuestionIndex > 0 && setCurrentQuestionIndex(q => q - 1)}
                 disabled={currentQuestionIndex === 0}
-                className="text-xs font-black text-slate-600 dark:text-slate-300 tracking-widest uppercase px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-orange-400 hover:text-orange-500 transition-all disabled:opacity-25 disabled:cursor-not-allowed min-h-[48px] flex items-center justify-center"
+                className="text-xs font-black text-slate-600 dark:text-slate-300 tracking-widest uppercase px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-orange-400 hover:text-orange-500 transition-all disabled:opacity-25 disabled:cursor-not-allowed min-h-12 flex items-center justify-center"
               >
                 ← Prev
               </button>
@@ -610,14 +685,14 @@ export default function StartTestPage() {
                 {currentQuestionIndex < currentQuestions.length - 1 ? (
                   <button
                     onClick={skipQuestion}
-                    className="w-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-black tracking-widest uppercase rounded-xl hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:text-orange-500 transition-colors min-h-[48px] flex items-center justify-center"
+                    className="w-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-black tracking-widest uppercase rounded-xl hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:text-orange-500 transition-colors min-h-12 flex items-center justify-center"
                   >
                     Skip →
                   </button>
                 ) : (
                   <button
                     onClick={submitTest}
-                    className="w-full bg-orange-500 hover:bg-orange-600 active:scale-[0.98] text-white text-xs font-black tracking-widest uppercase rounded-xl shadow-lg shadow-orange-500/20 transition-all min-h-[48px] flex items-center justify-center"
+                    className="w-full bg-orange-500 hover:bg-orange-600 active:scale-[0.98] text-white text-xs font-black tracking-widest uppercase rounded-xl shadow-lg shadow-orange-500/20 transition-all min-h-12 flex items-center justify-center"
                   >
                     Submit Test ✓
                   </button>
@@ -626,7 +701,7 @@ export default function StartTestPage() {
               <button
                 onClick={() => currentQuestionIndex < currentQuestions.length - 1 && setCurrentQuestionIndex(q => q + 1)}
                 disabled={currentQuestionIndex === currentQuestions.length - 1}
-                className="text-xs font-black text-slate-600 dark:text-slate-300 tracking-widest uppercase px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-orange-400 hover:text-orange-500 transition-all disabled:opacity-25 disabled:cursor-not-allowed min-h-[48px] flex items-center justify-center"
+                className="text-xs font-black text-slate-600 dark:text-slate-300 tracking-widest uppercase px-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-orange-400 hover:text-orange-500 transition-all disabled:opacity-25 disabled:cursor-not-allowed min-h-12 flex items-center justify-center"
               >
                 Next →
               </button>
@@ -861,26 +936,37 @@ export default function StartTestPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {SUBJECTS.map(s => {
+                const maxQCount = userPlan !== 'free' ? 50 : 10;
                 const records = dbState[today] || {};
                 const done = !!records[s.id];
                 const score = done ? records[s.id].score : 0;
                 const max = done ? records[s.id].max : 0;
-                const qCount = userPlan !== 'free' ? 10 : 3;
+                const limitReached = done && max >= maxQCount;
 
                 return (
                   <div
                     key={s.id}
-                    onClick={() => startTest(s)}
-                    className="bg-white dark:bg-[#111d2e] rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-orange-500 hover:shadow-md cursor-pointer transition-all flex flex-col relative group"
+                    onClick={() => !limitReached && startTest(s)}
+                    className={`bg-white dark:bg-[#111d2e] rounded-2xl p-5 shadow-sm border dark:border-slate-800 transition-all flex flex-col relative group ${
+                      limitReached
+                        ? 'border-slate-100 opacity-60 cursor-not-allowed'
+                        : 'border-slate-100 hover:border-orange-500 hover:shadow-md cursor-pointer'
+                    }`}
                   >
-                    {/* Top row: Icon and Start pill */}
+                    {/* Top row: Icon and Status pill */}
                     <div className="flex justify-between items-start mb-4">
                       <div className="w-12 h-12 rounded-xl bg-[#0d1b2a] flex items-center justify-center text-2xl shadow-inner">
                         {s.icon}
                       </div>
-                      <div className="px-3 py-1 rounded-full border border-orange-200 text-orange-500 text-[9px] font-bold uppercase tracking-widest bg-orange-50 dark:bg-orange-500/10 dark:border-orange-500/30 group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                        START
-                      </div>
+                      {limitReached ? (
+                        <div className="px-3 py-1 rounded-full border border-slate-200 text-slate-400 text-[9px] font-bold uppercase tracking-widest bg-slate-50 dark:bg-slate-800 dark:border-slate-700">
+                          Done
+                        </div>
+                      ) : (
+                        <div className="px-3 py-1 rounded-full border border-orange-200 text-orange-500 text-[9px] font-bold uppercase tracking-widest bg-orange-50 dark:bg-orange-500/10 dark:border-orange-500/30 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                          START
+                        </div>
+                      )}
                     </div>
                     
                     {/* Content */}
@@ -889,10 +975,19 @@ export default function StartTestPage() {
                         {s.name}
                       </h3>
                       <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
-                        <span>{done ? `Done: ${score}/${max}` : `${qCount} Qs`}</span>
+                        {done ? (
+                          <span>{`${score}/${max} correct`}</span>
+                        ) : (
+                          <span>{`${maxQCount} Qs`}</span>
+                        )}
                         <span>·</span>
                         <span>{testMode === 'timed' ? 'Timed' : 'Practice'}</span>
                       </div>
+                      {limitReached && (
+                        <span className="text-[9px] font-bold text-orange-500 uppercase tracking-wider mt-0.5">
+                          Daily limit reached
+                        </span>
+                      )}
                     </div>
                     
                     {/* Bottom Progress Line */}
@@ -921,8 +1016,8 @@ export default function StartTestPage() {
                   <Lock />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-white mb-2 tracking-tight">Upgrade to Premium</h2>
-                <p className="text-sm font-medium text-slate-400 mb-1">Free: 3 questions per subject.</p>
-                <p className="text-sm font-medium text-slate-400 mb-8">Premium: 10 questions + all difficulty levels + full analytics + history.</p>
+                <p className="text-sm font-medium text-slate-400 mb-1">Free: 10 questions per subject per day.</p>
+                <p className="text-sm font-medium text-slate-400 mb-8">Premium: 50 questions per day + all difficulty levels + full analytics + history.</p>
                 
                 <a
                   href="/mock-tests/upgrade"

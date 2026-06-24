@@ -259,3 +259,24 @@ model UpgradeRequest {
   @@index([userId])
   @@index([status])
 }
+
+// ────────────────────────────────────────────────
+// QUESTION HISTORY (Unique question delivery)
+// ────────────────────────────────────────────────
+
+// Tracks which questions a user has already seen per subject.
+// seenHashes is a JSON array of question-text hashes (SHA-like fingerprints).
+// When pool is nearly exhausted (< 10% left), this record is reset so
+// questions recycle — ensuring the user always gets a fresh batch.
+model UserQuestionHistory {
+  id         String   @id @default(cuid())
+  userId     String
+  subject    String   // "math" | "reasoning" | "english" | "gk" | "pyq"
+  seenHashes String   @db.Text @default("[]") // JSON array of question fingerprints
+  totalSeen  Int      @default(0) // cumulative count
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, subject])
+  @@index([userId])
+}
+

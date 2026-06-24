@@ -30,9 +30,19 @@ export async function verifyJob(jobId: string, isVerified: boolean) {
 
 export async function deleteJob(jobId: string) {
   await requireAdmin();
-  const job = await prisma.job.delete({
-    where: { id: jobId },
-  });
+  try {
+    await prisma.job.delete({
+      where: { id: jobId },
+    });
+  } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error) {
+      if ((error as { code: string }).code !== 'P2025') {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
   revalidatePath('/admin');
   revalidatePath('/');
 }
